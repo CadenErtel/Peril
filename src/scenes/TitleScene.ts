@@ -26,13 +26,17 @@ export default class TitleScene extends Phaser.Scene {
 
         const button1 = this.add.sprite(180, 225, 'button').setInteractive();
         button1.on('pointerdown', () => {
-            this.scene.start('gamestart');
+            this.cameras.main.fadeOut(250, 0, 0, 0);
         });
 
         const button2 = this.add.sprite(180, 300, 'button').setInteractive();
         button2.on('pointerdown', () => {
             this.scene.start('options');
         });
+
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start('gamestart', { fadeIn: true })
+        })
 
     }
 }
