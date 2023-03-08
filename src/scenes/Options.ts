@@ -6,7 +6,7 @@ export default class GameStartScene extends Phaser.Scene {
 	}
 
     preload () {
-        this.load.image('button', "/ButtonBlue.png");
+        this.load.image('button', "/blue-button-up.png");
     }
 
     create() {

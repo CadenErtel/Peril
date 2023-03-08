@@ -7,7 +7,7 @@ import OptionsScene from './scenes/Options'
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
 	scale: {
-        mode: Phaser.Scale.ENVELOP,
+        mode: Phaser.Scale.RESIZE,
         parent: 'app',
         width: '100%',
         height: '100%'
@@ -16,4 +16,4 @@ const config: Phaser.Types.Core.GameConfig = {
 	scene: [TitleScene, GameStartScene, OptionsScene]
 }
 
-export default new Phaser.Game(config)
+export default new Phaser.Game(config);
