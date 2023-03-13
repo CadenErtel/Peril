@@ -16,14 +16,26 @@ export default class TitleScene extends Phaser.Scene {
 
     create() {
 
+        // --------------------------------------------    Static Images    -------------------------------------------------------
+
         let image = this.add.image(0, 0, 'background').setOrigin(0,0);
-        image.displayWidth = this.sys.canvas.width;
-        image.displayHeight = this.sys.canvas.height;
+        image.displayWidth = window.innerWidth;
+        image.displayHeight = window.innerHeight;
         
         this.add.image(window.innerWidth / 2, window.innerHeight / 6, 'title').scale = 1.5;
+
+        // --------------------------------------------    Text Field     ---------------------------------------------------------
         
-        const input = this.add.dom(2 * window.innerWidth / 3, 2 * window.innerHeight / 5, 'input');
+        const input = this.add.dom(3 * window.innerWidth / 5, 11 * window.innerHeight / 21 - 15, 'input').setInteractive();
         input.node.setAttribute('id', 'join-game-field');
+        (input.node as HTMLInputElement).value = 'Enter Code'
+
+        input.addListener('pointerdown');
+        input.on('pointerdown', () => {
+            if ((input.node as HTMLInputElement).value === 'Enter Code') {
+                (input.node as HTMLInputElement).value = '';
+            }
+        });
         
         input.addListener('keydown');
         // When the user presses "Enter", log the text to the console
@@ -34,17 +46,18 @@ export default class TitleScene extends Phaser.Scene {
             }
         });
 
+        // --------------------------------------------    Buttons     ---------------------------------------------------------
+
         const button_press_sound = this.sound.add('button-press-sound');
         
         const button1 = this.add.sprite(window.innerWidth / 3, window.innerHeight / 2, 'atlas', 'host-button-up').setInteractive();
-        
         button1.on('pointerdown', () => {
             button_press_sound.play();
             buttonPress('host', button1);
             fadeOut('gamestart', this);
         });
         
-        const button2 = this.add.sprite(2 * window.innerWidth / 3, window.innerHeight / 2, 'atlas', 'join-button-up').setInteractive();
+        const button2 = this.add.sprite(2 * window.innerWidth / 3, 3 * window.innerHeight / 7 + 15, 'atlas', 'join-button-up').setInteractive();
         button2.on('pointerdown', () => {
             button2.anims.play("button-press");
             buttonPress('join', button2);
@@ -53,7 +66,6 @@ export default class TitleScene extends Phaser.Scene {
         
         const buttonPress = (button_name : string, currentButton : Phaser.GameObjects.Sprite) => {
 
-            // Define the "button-anim" animation with the "button-up" and "button-down" frames
             currentButton.anims.create({
                 key: 'button-press',
                 frames: [
@@ -68,6 +80,8 @@ export default class TitleScene extends Phaser.Scene {
             currentButton.anims.play("button-press");
 
         }
+
+        // --------------------------------------------    Transitions     ---------------------------------------------------------
         
         const fadeOut = (nextScene : string, currentScene : Phaser.Scene) => {
             currentScene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function () {
