@@ -26,9 +26,12 @@ export default class TitleScene extends Phaser.Scene {
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
-        const input = this.add.dom(3 * window.innerWidth / 5, 11 * window.innerHeight / 21 - 15, 'input').setInteractive();
+        const input = this.add.dom(2 * window.innerWidth / 3, 11 * window.innerHeight / 21, 'input').setInteractive();
+        // const input = this.add.dom(0, 0, 'input').setInteractive();
+        // input.setOrigin(.5,.5);
         input.node.setAttribute('id', 'join-game-field');
         input.node.setAttribute('maxlength', '7');
+        input.setDepth(2);
         (input.node as HTMLInputElement).value = 'Enter Code'
 
         input.addListener('pointerdown');
@@ -51,16 +54,16 @@ export default class TitleScene extends Phaser.Scene {
 
         const button_press_sound = this.sound.add('button-press-sound');
         
-        const button1 = this.add.sprite(window.innerWidth / 3, window.innerHeight / 2, 'atlas', 'host-button-up').setInteractive();
+        const button1 = this.add.sprite(window.innerWidth / 3, 10 * window.innerHeight / 21, 'atlas', 'host-button-up').setInteractive();
         button1.on('pointerdown', () => {
             button_press_sound.play();
             buttonPress('host', button1);
             fadeOut('gamestart', this);
         });
         
-        const button2 = this.add.sprite(2 * window.innerWidth / 3, 3 * window.innerHeight / 7 + 15, 'atlas', 'join-button-up').setInteractive();
+        const button2 = this.add.sprite(2 * window.innerWidth / 3, 3 * window.innerHeight / 7, 'atlas', 'join-button-up').setInteractive();
         button2.on('pointerdown', () => {
-            button2.anims.play("button-press");
+            button_press_sound.play();
             buttonPress('join', button2);
             fadeOut('gamestart', this);
         });
