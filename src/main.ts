@@ -13,7 +13,10 @@ const config: Phaser.Types.Core.GameConfig = {
         height: '100%'
     },
 	parent: 'app',
-	scene: [TitleScene, GameStartScene, OptionsScene]
+	scene: [TitleScene, GameStartScene, OptionsScene],
+    dom : {
+        createContainer: true
+    }
 }
 
 export default new Phaser.Game(config);

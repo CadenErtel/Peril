@@ -2,3 +2,13 @@ body {
     margin : 0;
     overflow: hidden;
 }
+
+#join-game-field {
+    font-size: 32px; 
+    width: 400px; 
+    height: 50px; 
+    border-radius: 25px; 
+    padding: 10px; 
+    text-align: center; 
+    background-color: #FFFFFF;
+}
