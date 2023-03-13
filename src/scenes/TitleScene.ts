@@ -28,6 +28,7 @@ export default class TitleScene extends Phaser.Scene {
         
         const input = this.add.dom(3 * window.innerWidth / 5, 11 * window.innerHeight / 21 - 15, 'input').setInteractive();
         input.node.setAttribute('id', 'join-game-field');
+        input.node.setAttribute('maxlength', '7');
         (input.node as HTMLInputElement).value = 'Enter Code'
 
         input.addListener('pointerdown');
