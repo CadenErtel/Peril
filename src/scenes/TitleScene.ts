@@ -11,7 +11,6 @@ export default class TitleScene extends Phaser.Scene {
 
         this.load.atlas('atlas', '/atlas/title/buttons.png', '/atlas/title/buttons.json');
         this.load.audio('button-press-sound', '/audio/button-press.mp3');
-
     }
 
     create() {
@@ -27,12 +26,9 @@ export default class TitleScene extends Phaser.Scene {
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
         const input = this.add.dom(2 * window.innerWidth / 3, 11 * window.innerHeight / 21, 'input').setInteractive();
-        // const input = this.add.dom(0, 0, 'input').setInteractive();
-        // input.setOrigin(.5,.5);
         input.node.setAttribute('id', 'join-game-field');
         input.node.setAttribute('maxlength', '7');
-        input.setDepth(2);
-        (input.node as HTMLInputElement).value = 'Enter Code'
+        (input.node as HTMLInputElement).value = 'Enter Code';
 
         input.addListener('pointerdown');
         input.on('pointerdown', () => {
