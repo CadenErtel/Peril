@@ -4,12 +4,9 @@
   "description": "game for SWE",
   "main": ".src/main.js",
   "scripts": {
-    "build-client": "webpack",
-    "build-client-watch": "webpack -w",
+    "build": "webpack",
     "start": "node server.js",
-    "test": "webpack && npm run start",
-    "start-dev": "NODE_ENV='development' npm run build-client-watch & NODE_ENV='development' npm run start-server",
-    "start-server": "nodemon server -e html,js,scss --ignore public --ignore client"
+    "rebuild": "webpack && npm run start"
   },
   "author": "Caden Ertel",
   "devDependencies": {
