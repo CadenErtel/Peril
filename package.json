@@ -8,7 +8,8 @@
     "start": "node ./server/server.js",
     "start-dev": "node ./server/dev-server.js",
     "rebuild": "webpack && npm run start",
-    "dev": "concurrently \"webpack serve\" \"npm run start-dev\""
+    "dev": "concurrently \"webpack serve\" \"npm run start-dev\"",
+    "build-prod" : "webpack --mode production"
   },
   "author": "Caden Ertel",
   "devDependencies": {

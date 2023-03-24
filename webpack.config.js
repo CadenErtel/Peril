@@ -18,6 +18,14 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"],
   },
+  cache: {
+    type: 'filesystem',
+    // Change the cache directory to a project-relative folder
+    cacheDirectory: path.resolve(__dirname, '.webpack_cache')
+  },
+  optimization: {
+    minimize: true,
+  },
   devtool: "source-map",
   devServer: {
     static: {
@@ -40,7 +48,7 @@ module.exports = {
   }
   },
   watchOptions: {
-    ignored: /node_modules/,
+    ignored: ["/node_modules/**", "/server/**"]
   },
   module: {
     rules: [

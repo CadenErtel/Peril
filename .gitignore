@@ -11,7 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
-bundle.js.LICENSE.txt
+.webpack_cache
+bundle.js*
 
 # Editor directories and files
 .vscode/*

@@ -1,7 +1,5 @@
 import Phaser from 'phaser';
 import {io} from "socket.io-client";
-let socket;
-
 
 export default class TitleScene extends Phaser.Scene {
     constructor() {
