@@ -19,23 +19,28 @@ export default class TitleScene extends Phaser.Scene {
     create() {
 
          // --------------------------------------------    Socket IO    -------------------------------------------------------
-        socket = io("ws://localhost:8080");
+        const socket = io("ws://localhost:8080", {
+            reconnection: false, // Disable automatic reconnection
+            reconnectionAttempts: 0, // Set maximum number of reconnection attempts to 0
+        });
 
-        // Handle Socket.io events
-        socket.on('connect', () => {
-            console.log('Connected to server');
-        });
-        
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-        });
-        
-        socket.on('message', (data) => {
-            console.log('Received message:', data);
-        });
-        
-        // Send a message to the server
-        socket.emit('message', 'Hello from the client');
+        if (socket) {
+            // Handle Socket.io events
+            socket.on('connect', () => {
+                console.log('Connected to server');
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+            });
+            
+            socket.on('message', (data) => {
+                console.log('Received message:', data);
+            });
+            
+            // Send a message to the server
+            socket.emit('message', 'Hello from the client');
+        }
 
         // --------------------------------------------    Static Images    -------------------------------------------------------
 

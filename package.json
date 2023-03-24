@@ -2,19 +2,24 @@
   "name": "peril",
   "version": "1.0.0",
   "description": "game for SWE",
-  "main": ".src/main.js",
+  "main": "./src/main.js",
   "scripts": {
     "build": "webpack",
-    "start": "node server.js",
-    "rebuild": "webpack && npm run start"
+    "start": "node ./server/server.js",
+    "start-dev": "node ./server/dev-server.js",
+    "rebuild": "webpack && npm run start",
+    "dev": "concurrently \"webpack serve\" \"npm run start-dev\""
   },
   "author": "Caden Ertel",
   "devDependencies": {
     "@babel/core": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
     "babel-loader": "^9.1.2",
+    "concurrently": "^7.6.0",
+    "html-webpack-plugin": "^5.5.0",
     "webpack": "^5.76.2",
-    "webpack-cli": "^5.0.1"
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1"
   },
   "dependencies": {
     "compression": "^1.7.4",
