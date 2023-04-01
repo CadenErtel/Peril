@@ -6,7 +6,7 @@ import OptionsScene from './scenes/Options'
 const config = {
 	type: Phaser.AUTO,
 	scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.SCALE,
         parent: 'app',
         width: '100%',
         height: '100%'
