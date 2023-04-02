@@ -43,7 +43,7 @@ export default class GameStartScene extends Phaser.Scene {
             }
         });
         
-        // --------------------------------------------    Static Images    -------------------------------------------------------
+        // --------------------------------------------    Static Objects    -------------------------------------------------------
         
         let bg = this.add.image(0, 0, 'background').setOrigin(0,0);
         bg.displayWidth = width;
@@ -54,7 +54,7 @@ export default class GameStartScene extends Phaser.Scene {
         this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
         this.add.text(width / 2 + 210, 85, `${data.roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
 
-        this.add.text(width / 5 + 50, height / 6, "Options", {fontFamily : "blazma", fontSize : "72px"});
+        this.add.text(240, height / 6, "Lobby Information", {fontFamily : "blazma", fontSize : "72px"});
 
         // --------------------------------------------    Buttons     ---------------------------------------------------------
         
