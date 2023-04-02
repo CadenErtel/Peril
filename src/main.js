@@ -5,14 +5,15 @@ import OptionsScene from './scenes/Options'
 
 const config = {
 	type: Phaser.AUTO,
+    width : 1920,
+    height : 1080,
+    resolution: window.devicePixelRatio || 1,
 	scale: {
-        mode: Phaser.Scale.SCALE,
-        parent: 'app',
-        width: '100%',
-        height: '100%'
+        mode: Phaser.Scale.FIT,
+		autoCenter: Phaser.Scale.CENTER_BOTH
     },
-	parent: 'app',
 	scene: [TitleScene, GameStartScene, OptionsScene],
+	parent: 'app',
     dom : {
         createContainer: true
     }

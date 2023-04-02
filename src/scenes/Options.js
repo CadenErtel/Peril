@@ -16,18 +16,21 @@ export default class GameStartScene extends Phaser.Scene {
 
     create(data) {
 
+        const width = this.sys.game.config.width;
+        const height = this.sys.game.config.height;
+        console.log(width, height);
         
         // --------------------------------------------    Static Images    -------------------------------------------------------
         
         let bg = this.add.image(0, 0, 'background').setOrigin(0,0);
-        bg.displayWidth = window.innerWidth;
-        bg.displayHeight = window.innerHeight;
+        bg.displayWidth = width;
+        bg.displayHeight = height;
 
-        let image = this.add.image(window.innerWidth / 3, window.innerHeight / 12, 'menu-box').setOrigin(0,0);
+        let image = this.add.image(width / 3, height / 12, 'menu-box').setOrigin(0,0);
 
         // --------------------------------------------    Buttons     ---------------------------------------------------------
         
-        const backBtn = this.add.sprite(window.innerWidth / 7, window.innerHeight / 17, 'atlas', 'host-button-up').setInteractive();
+        const backBtn = this.add.sprite(width / 7, height / 17, 'atlas', 'host-button-up').setInteractive();
         backBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             buttonPress('host', backBtn);

@@ -17,6 +17,9 @@ export default class TitleScene extends Phaser.Scene {
     
     create(data) {
 
+        const width = this.sys.game.config.width;
+        const height = this.sys.game.config.height;
+        
          // --------------------------------------------    Socket IO    -------------------------------------------------------
         const socket = io("ws://localhost:8080", {
             reconnection: false, // Disable automatic reconnection
@@ -44,14 +47,14 @@ export default class TitleScene extends Phaser.Scene {
         // --------------------------------------------    Static Images    -------------------------------------------------------
 
         let image = this.add.image(0, 0, 'background').setOrigin(0,0);
-        image.displayWidth = window.innerWidth;
-        image.displayHeight = window.innerHeight;
+        image.displayWidth = width;
+        image.displayHeight = height;
         
-        this.add.image(window.innerWidth / 2, window.innerHeight / 6, 'title').scale = 1.5;
+        this.add.image(width / 2, height / 6, 'title').scale = 1.5;
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
-        const input = this.add.dom(2 * window.innerWidth / 3, 11 * window.innerHeight / 21, 'input').setInteractive();
+        const input = this.add.dom(2 * width / 3, 11 * height / 21, 'input').setInteractive();
         input.node.setAttribute('id', 'join-game-field');
         input.node.setAttribute('maxlength', '7');
         input.node.value = 'Enter Code';
@@ -74,14 +77,14 @@ export default class TitleScene extends Phaser.Scene {
 
         // --------------------------------------------    Buttons     ---------------------------------------------------------
         
-        const hostBtn = this.add.sprite(window.innerWidth / 3, 10 * window.innerHeight / 21, 'atlas', 'host-button-up').setInteractive();
+        const hostBtn = this.add.sprite(width / 3, 10 * height / 21, 'atlas', 'host-button-up').setInteractive();
         hostBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             buttonPress('host', hostBtn);
             fadeOut('options', this);
         });
         
-        const joinBtn = this.add.sprite(2 * window.innerWidth / 3, 3 * window.innerHeight / 7, 'atlas', 'join-button-up').setInteractive();
+        const joinBtn = this.add.sprite(2 * width / 3, 3 * height / 7, 'atlas', 'join-button-up').setInteractive();
         joinBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             buttonPress('join', joinBtn);
