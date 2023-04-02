@@ -4,12 +4,11 @@
   "description": "game for SWE",
   "main": "./src/main.js",
   "scripts": {
-    "build": "webpack --mode=none",
+    "build": "webpack --config=webpack.prod.js",
     "start": "node ./server/server.js",
     "start-dev": "node ./server/dev-server.js",
-    "rebuild": "webpack && npm run start",
-    "dev": "concurrently \"webpack serve --config=webpack.dev.js\" \"npm run start-dev\"",
-    "build-prod": "webpack --config=webpack.prod.js"
+    "rebuild": "webpack --config=webpack.prod.js && npm run start",
+    "dev": "concurrently \"webpack serve --config=webpack.dev.js\" \"npm run start-dev\""
   },
   "author": "Caden Ertel",
   "devDependencies": {
