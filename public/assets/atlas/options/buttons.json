@@ -1,0 +1,103 @@
+{
+	"textures": [
+		{
+			"image": "buttons",
+			"format": "RGBA8888",
+			"size": {
+				"w": 795,
+				"h": 185
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "start-button-up",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 366,
+						"h": 93
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 2,
+						"w": 351,
+						"h": 90
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 351,
+						"h": 90
+					}
+				},
+				{
+					"filename": "start-button-down",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 366,
+						"h": 93
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 6,
+						"w": 351,
+						"h": 86
+					},
+					"frame": {
+						"x": 351,
+						"y": 0,
+						"w": 351,
+						"h": 86
+					}
+				},
+				{
+					"filename": "back-button-up",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 97,
+						"h": 107
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 3,
+						"w": 93,
+						"h": 102
+					},
+					"frame": {
+						"x": 702,
+						"y": 0,
+						"w": 93,
+						"h": 102
+					}
+				},
+				{
+					"filename": "back-button-down",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 97,
+						"h": 107
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 6,
+						"w": 93,
+						"h": 99
+					},
+					"frame": {
+						"x": 351,
+						"y": 86,
+						"w": 93,
+						"h": 99
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

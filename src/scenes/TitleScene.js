@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import {io} from "socket.io-client";
 import { fadeOut, buttonPress } from '../common';
 
+
 export default class TitleScene extends Phaser.Scene {
     constructor() {
         super('title');
@@ -11,21 +12,21 @@ export default class TitleScene extends Phaser.Scene {
         this.load.image('title', "assets/images/title.png");
         this.load.image('background', 'assets/images/title_bg.png');
         
-        this.load.atlas('atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
+        this.load.atlas('title-atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
     }
     
     create(data) {
-
+        
         const width = this.sys.game.config.width;
         const height = this.sys.game.config.height;
         
-         // --------------------------------------------    Socket IO    -------------------------------------------------------
+        // --------------------------------------------    Socket IO    -------------------------------------------------------
         const socket = io("ws://localhost:8080", {
             reconnection: false, // Disable automatic reconnection
             reconnectionAttempts: 0, // Set maximum number of reconnection attempts to 0
         });
-
+        
         if (socket) {
             // Handle Socket.io events
             socket.on('connect', () => {
@@ -35,13 +36,6 @@ export default class TitleScene extends Phaser.Scene {
             socket.on('disconnect', () => {
                 console.log('Disconnected from server');
             });
-            
-            socket.on('message', (data) => {
-                console.log('Received message:', data);
-            });
-            
-            // Send a message to the server
-            socket.emit('message', 'Hello from the client');
         }
 
         // --------------------------------------------    Static Images    -------------------------------------------------------
@@ -65,30 +59,57 @@ export default class TitleScene extends Phaser.Scene {
                 input.node.value = '';
             }
         });
+
+        //always make the string typed uppercase
+        input.addListener('input');
+        input.on('input', (event) => {
+            event.target.value = event.target.value.toUpperCase();
+        });
+
+        // Allows the unfocusing of the text field
+        this.input.on('pointerdown', (_, gameObjects) => {
+            // Check if the click occurred outside of the input field
+            const clickedOutsideInput = !gameObjects.find(gameObject => gameObject.node === input.node);
         
-        input.addListener('keydown');
-        // When the user presses "Enter", log the text to the console
-        input.on('keydown', (event) => {
-            if (event.key === 'Enter') {
-                console.log(input.node.value);
-                input.node.value = '';
+            // If the click occurred outside of the input field, unfocus it
+            if (clickedOutsideInput) {
+                input.node.blur();
             }
         });
 
         // --------------------------------------------    Buttons     ---------------------------------------------------------
         
-        const hostBtn = this.add.sprite(width / 3, 10 * height / 21, 'atlas', 'host-button-up').setInteractive();
+        const hostBtn = this.add.sprite(width / 3, 10 * height / 21, 'title-atlas', 'host-button-up').setInteractive();
         hostBtn.on('pointerdown', () => {
-            this.sound.play('button-press-sound');
-            buttonPress('host', hostBtn);
-            fadeOut('options', this);
+
+            socket.emit('createRoom');
+
+            socket.once('createRoom', (roomCode) => {
+                console.log(`Room created with code ${roomCode}`);
+
+                this.sound.play('button-press-sound');
+                buttonPress('title-atlas', 'host', hostBtn);
+                fadeOut('options', this, {socket : socket, roomCode : roomCode});
+            });
         });
         
-        const joinBtn = this.add.sprite(2 * width / 3, 3 * height / 7, 'atlas', 'join-button-up').setInteractive();
+        const joinBtn = this.add.sprite(2 * width / 3, 3 * height / 7, 'title-atlas', 'join-button-up').setInteractive();
         joinBtn.on('pointerdown', () => {
+
+            socket.emit('joinRoom', input.node.value);
+
             this.sound.play('button-press-sound');
-            buttonPress('join', joinBtn);
-            fadeOut('gamestart', this);
+            buttonPress('title-atlas', 'join', joinBtn);
+
+            socket.on('error', (message) => {
+                alert(message);
+            });
+
+            socket.on('joinRoom', (roomCode) => {
+                console.log(`Room joined with code ${roomCode}`);
+                fadeOut('options', this, {socket : socket, roomCode : roomCode});
+            });
+
         });
 
         // --------------------------------------------    Transitions     ---------------------------------------------------------
