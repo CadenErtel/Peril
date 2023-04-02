@@ -21,14 +21,14 @@ module.exports = {
     mode: 'production',
     entry: ["core-js/stable", "regenerator-runtime/runtime", "./src/main.js"],
     output: {
-        path: path.resolve(__dirname, "../dist"),
+        path: path.resolve(__dirname, "/dist"),
         publicPath: "/",
         filename: "bundle.js",
     },
     cache: {
         type: 'filesystem',
         // Change the cache directory to a project-relative folder
-        cacheDirectory: path.resolve(__dirname, '../.webpack_cache')
+        cacheDirectory: path.resolve(__dirname, '/.webpack_cache')
     },
     optimization: {
         minimize: true,
