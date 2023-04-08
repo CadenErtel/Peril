@@ -81,35 +81,32 @@ export default class TitleScene extends Phaser.Scene {
         
         const hostBtn = this.add.sprite(width / 3, 10 * height / 21, 'title-atlas', 'host-button-up').setInteractive();
         hostBtn.on('pointerdown', () => {
-
             socket.emit('createRoom');
 
-            socket.once('createRoom', (roomCode) => {
-                console.log(`Room created with code ${roomCode}`);
-
-                this.sound.play('button-press-sound');
-                buttonPress('title-atlas', 'host', hostBtn);
-                fadeOut('options', this, {socket : socket, roomCode : roomCode});
-            });
+            this.sound.play('button-press-sound');
+            buttonPress('title-atlas', 'host', hostBtn);
         });
         
         const joinBtn = this.add.sprite(2 * width / 3, 3 * height / 7, 'title-atlas', 'join-button-up').setInteractive();
-        joinBtn.on('pointerdown', () => {
-
+        joinBtn.on('pointerdown', () => {  
             socket.emit('joinRoom', input.node.value);
-
+            
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'join', joinBtn);
+        });
 
-            socket.on('error', (message) => {
-                alert(message);
-            });
-
-            socket.on('joinRoom', (roomCode) => {
-                console.log(`Room joined with code ${roomCode}`);
-                fadeOut('options', this, {socket : socket, roomCode : roomCode});
-            });
-
+        socket.on('roomCreated', (roomCode) => {
+            console.log(`Room created with code ${roomCode}`);
+            fadeOut('options', this, {socket : socket, roomCode : roomCode});
+        });
+        
+        socket.on('roomJoined', (roomCode) => {
+            console.log(`Room joined with code ${roomCode}`);
+            fadeOut('options', this, {socket : socket, roomCode : roomCode});
+        });
+        
+        socket.on('error', (message) => {
+            alert(message);
         });
 
         // --------------------------------------------    Transitions     ---------------------------------------------------------

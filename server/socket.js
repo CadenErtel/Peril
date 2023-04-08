@@ -9,7 +9,7 @@ module.exports = function(io) {
             socket.roomCode = roomCode;
             socket.player = 1;
             socket.host = true;
-            socket.emit('createRoom', roomCode);
+            socket.emit('roomCreated', roomCode);
         });
 
         socket.on('joinRoom', (roomCode) => {
@@ -20,7 +20,7 @@ module.exports = function(io) {
                 if (room.players < 4) {
                     room.players += 1;
                     socket.player = room.players;
-                    socket.emit('joinRoom', roomCode);
+                    socket.emit('roomJoined', roomCode);
                     socket.to(roomCode).emit('playerCount', room.players);
                 } else {
                     socket.emit('error', "This room is already full!");
