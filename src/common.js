@@ -16,6 +16,27 @@ export function buttonPress (atlas_name, button_name, currentButton) {
     currentButton.anims.play("button-press");
 }
 
+export function colorTransition(scene, sprite, startColor, endColor) {
+    
+    const startColorValue = Phaser.Display.Color.ValueToColor(startColor);
+    const endColorValue = Phaser.Display.Color.ValueToColor(endColor);
+    
+    scene.tweens.addCounter({
+        from: 0,
+        to: 100,
+        targets: sprite,
+        duration: 1000,
+        ease: Phaser.Math.Easing.Sine.InOut,
+        onUpdate: transition => {
+            const value = transition.getValue()
+            const colorObject = Phaser.Display.Color.Interpolate.ColorWithColor(startColorValue, endColorValue, 100, value)
+            const color = Phaser.Display.Color.GetColor(colorObject.r, colorObject.g, colorObject.b);
+            sprite.setTint(color);
+        }
+    });
+
+}
+
 // --------------------------------------------    Transitions     ---------------------------------------------------------
 
 export function fadeOut (nextScene, currentScene, data = {}) {
