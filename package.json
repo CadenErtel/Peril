@@ -1,22 +1,33 @@
 {
-	"name": "phaser3-typescript-vite-template",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"start": "vite",
-		"build": "tsc && vite build",
-		"preview": "vite preview"
-	},
-	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^5.40.0",
-		"@typescript-eslint/parser": "^5.40.0",
-		"eslint": "^8.25.0",
-		"typescript": "^4.6.4",
-		"vite": "^4.1.4"
-	},
-	"dependencies": {
-		"phaser": "^3.55.2",
-		"socket.io": "^4.6.1"
-	}
+  "name": "peril",
+  "version": "1.0.0",
+  "description": "game for SWE",
+  "main": "./src/main.js",
+  "scripts": {
+    "build": "webpack --config=webpack.prod.js",
+    "start": "node ./server/server.js",
+    "start-dev": "node ./server/dev-server.js",
+    "rebuild": "webpack --config=webpack.prod.js && npm run start",
+    "dev": "concurrently \"webpack serve --config=webpack.dev.js\" \"npm run start-dev\""
+  },
+  "author": "Caden Ertel",
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "concurrently": "^7.6.0",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.76.2",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "core-js": "^3.29.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0",
+    "phaser": "^3.55.2",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1"
+  }
 }

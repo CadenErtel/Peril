@@ -1,11 +1,13 @@
 body {
     margin : 0;
+    padding: 0;
     overflow: hidden;
+    background-color: black;
 }
 
 @font-face {
     font-family: 'Blazma';
-    src: url('/fonts/Blazma-Regular.woff2');
+    src: url('/assets/fonts/Blazma-Regular.woff2');
 }
 
 #join-game-field {
