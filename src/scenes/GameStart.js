@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { colorTransition } from '../common';
+import { colorTransition, shakeScreen } from '../common';
 
 export default class GameStartScene extends Phaser.Scene {
     constructor() {
@@ -31,6 +31,7 @@ export default class GameStartScene extends Phaser.Scene {
             colorTransition(this, box1, 0xffffff, 0x00ff00);
             colorTransition(this, box2, 0xffffff, 0x00ff00); 
             colorTransition(this, box3, 0xffffff, 0x00ff00); 
+            shakeScreen(this, 200, .02);
         });
 
 
