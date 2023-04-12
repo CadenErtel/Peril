@@ -16,6 +16,17 @@ export function buttonPress (atlas_name, button_name, currentButton) {
     currentButton.anims.play("button-press");
 }
 
+// --------------------------------------------    Transitions     ---------------------------------------------------------
+
+export function fadeOut (nextScene, currentScene, data = {}) {
+    currentScene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function () {
+        console.log('Fade out complete for button:', nextScene);
+        currentScene.scene.start(nextScene, { fadeIn: true, ...data });
+    }, currentScene);
+    
+    currentScene.cameras.main.fadeOut(250);
+}
+
 export function colorTransition(scene, sprite, startColor, endColor) {
     
     const startColorValue = Phaser.Display.Color.ValueToColor(startColor);
@@ -34,16 +45,8 @@ export function colorTransition(scene, sprite, startColor, endColor) {
             sprite.setTint(color);
         }
     });
-
 }
 
-// --------------------------------------------    Transitions     ---------------------------------------------------------
-
-export function fadeOut (nextScene, currentScene, data = {}) {
-    currentScene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function () {
-        console.log('Fade out complete for button:', nextScene);
-        currentScene.scene.start(nextScene, { fadeIn: true, ...data });
-    }, currentScene);
-    
-    currentScene.cameras.main.fadeOut(250);
+export function shakeScreen (scene, duration, intensity) {
+    scene.cameras.main.shake(duration, intensity);
 }
