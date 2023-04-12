@@ -97,12 +97,12 @@ export default class TitleScene extends Phaser.Scene {
 
         socket.on('roomCreated', (roomCode) => {
             console.log(`Room created with code ${roomCode}`);
-            fadeOut('options', this, {socket : socket, roomCode : roomCode});
+            fadeOut('options', this, {socket : socket, roomCode : roomCode, currPlayers : 1});
         });
         
-        socket.on('roomJoined', (roomCode) => {
-            console.log(`Room joined with code ${roomCode}`);
-            fadeOut('options', this, {socket : socket, roomCode : roomCode});
+        socket.on('roomJoined', (data) => {
+            console.log(`Room joined with code ${data[0]}`);
+            fadeOut('options', this, {socket : socket, roomCode : data[0], currPlayers : data[1]});
         });
         
         socket.on('error', (message) => {

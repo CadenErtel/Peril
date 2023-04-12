@@ -10,16 +10,19 @@ export default class GameStartScene extends Phaser.Scene {
     preload () {
         this.load.image('menu-box', 'assets/images/menu-box.png');
         this.load.atlas('options-atlas', 'assets/atlas/options/buttons.png', 'assets/atlas/options/buttons.json');
-    }
-    
-    create(data) {
-        
         this.players = [];
         for (let i = 0; i < 4; i++){
             const player = this.add.text(1275, 235 + (i * 125), `Player ${i+1} \u2714`, {fontFamily : "blazma", fontSize : "60px"});
             player.setVisible(false);
             player.setDepth(10);
             this.players.push(player);
+        }
+    }
+    
+    create(data) {
+
+        for (let i = 0; i < data.currPlayers; i++){
+            this.players[i].setVisible(true);
         }
 
         const width = this.sys.game.config.width;
@@ -29,11 +32,10 @@ export default class GameStartScene extends Phaser.Scene {
         
         const socket = data.socket;
 
-        if (socket) {
-            socket.emit('getPlayerCount');
-        }
+        socket.on('newPlayer', (count) => {
 
-        socket.on('playerCount', (count) => {
+            console.log("New Player Joined or Left!");
+
             for (let i = 0; i < count; i++){
                 this.players[i].setVisible(true);
             }

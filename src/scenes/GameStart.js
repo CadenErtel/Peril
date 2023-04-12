@@ -28,9 +28,9 @@ export default class GameStartScene extends Phaser.Scene {
 
         const buttonJoin = this.add.sprite(width / 2, height / 4, 'title-atlas', 'join-button-up').setInteractive();
         buttonJoin.on('pointerdown', () => {
-            colorTransition(this, box1, 0xffffff, 0x00ff00);
+            colorTransition(this, box1, 0xffffff, 0xff0000);
             colorTransition(this, box2, 0xffffff, 0x00ff00); 
-            colorTransition(this, box3, 0xffffff, 0x00ff00); 
+            colorTransition(this, box3, 0xffffff, 0x0000ff); 
             shakeScreen(this, 200, .02);
         });
 
