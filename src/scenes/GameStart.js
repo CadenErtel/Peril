@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { colorTransition, shakeScreen } from '../common';
+import { addText, colorTransition, replaceText, shakeScreen } from '../common';
 
 export default class GameStartScene extends Phaser.Scene {
     constructor() {
@@ -39,12 +39,24 @@ export default class GameStartScene extends Phaser.Scene {
 
         const box1 = this.add.sprite(width / 4, 3 * height / 4, 'menu-box').setInteractive();
         box1.scale = .25;
+        const box1Text = addText(this, box1, '5', '64px', '#f0f');
+        box1.on('pointerdown', () => {
+            var num = parseInt(box1Text.text);
+            var num = num - 1;
+            replaceText(box1, box1Text, num.toString());
+            colorTransition(this, box1, 0xffffff, 0xff00ff);
+            shakeScreen(this, 200, .02);
+        });
 
         const box2 = this.add.sprite(2*width / 4, 3 * height / 4, 'menu-box').setInteractive();
         box2.scale = .25;
+        const box2Text = addText(this, box2, '15', '32px', '#ff0');
+        box2Text.setColor('#f0f');
 
         const box3 = this.add.sprite(3*width / 4, 3 * height / 4, 'menu-box').setInteractive();
         box3.scale = .25;
+        const box3Text = addText(this, box3, '3', '48px', '#fff');
+        box3Text.setText('8');
 
     }
 }

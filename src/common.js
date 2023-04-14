@@ -27,7 +27,7 @@ export function fadeOut (nextScene, currentScene, data = {}) {
     currentScene.cameras.main.fadeOut(250);
 }
 
-export function colorTransition(scene, sprite, startColor, endColor) {
+export function colorTransition (scene, sprite, startColor, endColor) {
     
     const startColorValue = Phaser.Display.Color.ValueToColor(startColor);
     const endColorValue = Phaser.Display.Color.ValueToColor(endColor);
@@ -49,4 +49,17 @@ export function colorTransition(scene, sprite, startColor, endColor) {
 
 export function shakeScreen (scene, duration, intensity) {
     scene.cameras.main.shake(duration, intensity);
+}
+
+// --------------------------------------------    Text Functions     ---------------------------------------------------------
+
+export function addText (scene, sprite, text, size, color) {
+    const word = scene.add.text(0, 0, text, { fontSize: size, fill: color });
+    word.setPosition(sprite.x - word.width / 2, sprite.y - word.height /2);
+    return word;
+}
+
+export function replaceText(sprite, textObject, text) {
+    textObject.setText(text);
+    textObject.setPosition(sprite.x - textObject.width / 2, sprite.y - textObject.height /2);
 }
