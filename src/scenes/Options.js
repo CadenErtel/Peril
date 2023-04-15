@@ -74,7 +74,7 @@ export default class GameStartScene extends Phaser.Scene {
         startBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             buttonPress('options-atlas','start', startBtn);
-            fadeOut('gamestart', this);
+            fadeOut('game', this);
         });
 
         // --------------------------------------------    Player Icons     ---------------------------------------------------------

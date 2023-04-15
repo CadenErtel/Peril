@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import { addText, colorTransition, replaceText, shakeScreen } from '../common';
 
-export default class GameStartScene extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
     constructor() {
-		super('gamestart');
+		super('game');
 	}
 
     preload () {
