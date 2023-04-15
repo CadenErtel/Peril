@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import TitleScene from './scenes/TitleScene'
-import GameStartScene from './scenes/GameStart'
 import OptionsScene from './scenes/Options'
+import GameScene from './scenes/Game'
 
 const config = {
 	type: Phaser.AUTO,
@@ -12,7 +12,7 @@ const config = {
         mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH
     },
-	scene: [TitleScene, GameStartScene, OptionsScene],
+	scene: [TitleScene, OptionsScene, GameScene],
 	parent: 'app',
     dom : {
         createContainer: true

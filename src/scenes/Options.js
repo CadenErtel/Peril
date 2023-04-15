@@ -70,11 +70,15 @@ export default class GameStartScene extends Phaser.Scene {
             fadeOut('title', this);
         });
 
-        const startBtn = this.add.sprite(1250, 725, 'options-atlas', 'start-button-up').setInteractive().setOrigin(0, 0);
+        const startBtn = this.add.sprite(1250, 725, 'options-atlas', 'start-button-up').setOrigin(0, 0);
+        if (data.host) {
+            startBtn.setInteractive();
+        }
         startBtn.on('pointerdown', () => {
+            socket.emit('startGame');
             this.sound.play('button-press-sound');
             buttonPress('options-atlas','start', startBtn);
-            fadeOut('gamestart', this);
+            fadeOut('game', this);
         });
 
         // --------------------------------------------    Player Icons     ---------------------------------------------------------
@@ -87,7 +91,7 @@ export default class GameStartScene extends Phaser.Scene {
         // --------------------------------------------    Transitions     ---------------------------------------------------------
         
         if (data.fadeIn){
-            this.cameras.main.fadeIn(500, 0, 0, 0)
+            this.cameras.main.fadeIn(300, 0, 0, 0)
         }
     }
 }
