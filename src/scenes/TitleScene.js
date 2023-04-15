@@ -97,12 +97,12 @@ export default class TitleScene extends Phaser.Scene {
 
         socket.on('roomCreated', (roomCode) => {
             console.log(`Room created with code ${roomCode}`);
-            fadeOut('options', this, {socket : socket, roomCode : roomCode, currPlayers : 1});
+            fadeOut('options', this, {socket : socket, roomCode : roomCode, currPlayers : 1, host : true});
         });
         
         socket.on('roomJoined', (data) => {
             console.log(`Room joined with code ${data[0]}`);
-            fadeOut('options', this, {socket : socket, roomCode : data[0], currPlayers : data[1]});
+            fadeOut('options', this, {socket : socket, roomCode : data[0], currPlayers : data[1], host : data[2]});
         });
         
         socket.on('error', (message) => {
@@ -112,7 +112,7 @@ export default class TitleScene extends Phaser.Scene {
         // --------------------------------------------    Transitions     ---------------------------------------------------------
         
         if (data.fadeIn){
-            this.cameras.main.fadeIn(500, 0, 0, 0)
+            this.cameras.main.fadeIn(300, 0, 0, 0)
         }
     }
 }

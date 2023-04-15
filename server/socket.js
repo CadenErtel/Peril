@@ -2,6 +2,9 @@ const rooms = {};
 
 module.exports = function(io) {
     io.on('connection', (socket) => {
+
+        // ============================ TITLE ==============================
+
         socket.on('createRoom', () => {
             let roomCode = generateRoomCode();
             // generate a new key if it already exists
@@ -20,13 +23,13 @@ module.exports = function(io) {
         socket.on('joinRoom', (roomCode) => {
             const room = rooms[roomCode];
             if (room) {
-                socket.join(roomCode);
-                socket.roomCode = roomCode;
-                socket.host = false;
                 if (room.players < 4) {
+                    socket.join(roomCode);
+                    socket.roomCode = roomCode;
+                    socket.host = false;
                     room.players += 1;
                     socket.player = room.players;
-                    socket.emit('roomJoined', [roomCode, room.players]);
+                    socket.emit('roomJoined', [roomCode, room.players , socket.host]);
                     socket.to(roomCode).emit('newPlayer', room.players);
                 } else {
                     socket.emit('error', "This room is already full!");
@@ -38,13 +41,13 @@ module.exports = function(io) {
             console.log(rooms);
         });
 
-        socket.on('getPlayerCount', () => {
-            const room = rooms[socket.roomCode];
-            if (room) {
-                socket.emit('playerCount', room.players);
-            }
-            console.log(rooms);
+        // ============================ OPTIONS ==============================
+
+        socket.on('startGame', () => {
+
         });
+
+        // ============================ DISCONNECTS ==============================
 
         socket.on('leaveRoom', () => {
             const roomCode = socket.roomCode;
