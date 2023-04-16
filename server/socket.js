@@ -5,7 +5,7 @@ module.exports = function(io) {
 
         // ============================ TITLE ==============================
 
-        socket.on('createRoom', () => {
+        socket.on('createRoom', (nickname) => {
             let roomCode = generateRoomCode();
             // generate a new key if it already exists
             while (roomCode in rooms) { 
@@ -13,24 +13,26 @@ module.exports = function(io) {
             }
             rooms[roomCode] = { players: 1 , started : false};
             socket.join(roomCode);
+            socket.data.nickname = nickname;
             socket.data.roomCode = roomCode;
             socket.data.player = 1;
             socket.data.host = true;
-            socket.emit('roomCreated', roomCode);
+            playersToSocket(socket, 'roomCreated', roomCode);
             console.log(rooms);
         });
 
-        socket.on('joinRoom', (roomCode) => {
+        socket.on('joinRoom', (roomCode, nickname) => {
             const room = rooms[roomCode];
             if (room) {
                 if (room.players < 4) {
                     socket.join(roomCode);
-                    socket.data.roomCode = roomCode;
                     room.players += 1;
+                    socket.data.nickname = nickname;
+                    socket.data.roomCode = roomCode;
                     socket.data.player = room.players;
                     socket.data.host = false;
-                    socket.emit('roomJoined', [roomCode, room.players , socket.data.host]);
-                    socket.to(roomCode).emit('newPlayer', room.players);
+                    playersToSocket(socket, 'roomJoined', roomCode);
+                    playersToRoom(socket, roomCode);
                 } else {
                     socket.emit('error', "This room is already full!");
                 }
@@ -44,7 +46,9 @@ module.exports = function(io) {
         // ============================ OPTIONS ==============================
 
         socket.on('startGame', () => {
-
+            const roomCode = socket.data.roomCode;
+            rooms[roomCode].started = true;
+            io.to(roomCode).emit('startedGame');
         });
 
         // ============================ DISCONNECTS ==============================
@@ -61,7 +65,7 @@ module.exports = function(io) {
                     delete rooms[roomCode];
                 // else update the rooms player count
                 } else {
-                    socket.to(roomCode).emit('newPlayer', room.players);
+                    playersToRoom(socket, roomCode);
                 }
                 socket.data.roomCode = null;
                 socket.data.host = null;
@@ -82,7 +86,7 @@ module.exports = function(io) {
                     delete rooms[roomCode];
                 // else update the rooms player count
                 } else {
-                    socket.to(roomCode).emit('newPlayer', room.players);
+                    playersToRoom(socket, roomCode);
                 }
                 socket.data.roomCode = null;
                 socket.data.host = null;
@@ -105,6 +109,31 @@ module.exports = function(io) {
                 }
             }
         }
+    }
+
+    async function playersToSocket(socket, where, roomCode){
+        const data = await getPlayers(roomCode);
+        socket.emit(where, data);
+    }
+
+    async function playersToRoom(socket, roomCode){
+        const data = await getPlayers(roomCode);
+        console.log(data);
+        socket.to(roomCode).emit('newPlayer', data);
+    }
+
+    async function getPlayers(roomCode){
+
+        const sockets = await io.in(roomCode).fetchSockets();
+        const playerData = {}
+
+        for (const socket of sockets) {
+            playerData[socket.data.player] = {nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode};
+        }
+
+        console.log(playerData);
+
+        return playerData;
     }
 };
 

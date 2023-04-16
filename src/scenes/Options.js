@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import {fadeOut, buttonPress} from '../common';
 
 export default class GameStartScene extends Phaser.Scene {
-
+    
     constructor() {
         super('options');
 	}
@@ -10,18 +10,27 @@ export default class GameStartScene extends Phaser.Scene {
     preload () {
         this.load.image('menu-box', 'assets/images/menu-box.png');
         this.load.atlas('options-atlas', 'assets/atlas/options/buttons.png', 'assets/atlas/options/buttons.json');
+
         this.players = [];
+
         for (let i = 0; i < 4; i++){
-            const player = this.add.text(1275, 235 + (i * 125), `Player ${i+1} \u2714`, {fontFamily : "blazma", fontSize : "60px"});
+            const rect = this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 225 + (i*125), 400, 75, 10);
+            rect.setDepth(9);
+            const player = this.add.text(0, 0, `Player ${i+1}`, {fontFamily : "blazma", fontSize : "60px"});
+            player.setOrigin(0.5);
+            player.setPosition(1435, 225 + (i*125) + 36);
             player.setVisible(false);
             player.setDepth(10);
             this.players.push(player);
         }
+
     }
     
     create(data) {
 
-        for (let i = 0; i < data.currPlayers; i++){
+        for (let i = 0; i < Object.keys(data.players).length; i++){
+            console.log(data.players[i+1].nickname);
+            this.players[i].setText(data.players[i+1].nickname);
             this.players[i].setVisible(true);
         }
 
@@ -32,11 +41,13 @@ export default class GameStartScene extends Phaser.Scene {
         
         const socket = data.socket;
 
-        socket.on('newPlayer', (count) => {
+        socket.on('newPlayer', (players) => {
 
+            const count = Object.keys(players).length;
             console.log("New Player Joined or Left!");
 
             for (let i = 0; i < count; i++){
+                this.players[i].setText(players[i+1].nickname);
                 this.players[i].setVisible(true);
             }
 
@@ -54,6 +65,9 @@ export default class GameStartScene extends Phaser.Scene {
 
         });
 
+        socket.on('startedGame', () => {
+            fadeOut('game', this);
+        });
         
         // --------------------------------------------    Static Objects    -------------------------------------------------------
         
@@ -64,7 +78,7 @@ export default class GameStartScene extends Phaser.Scene {
         this.add.image(width / 10, height / 2, 'menu-box').setOrigin(0,0.5);
 
         this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
-        this.add.text(width / 2 + 210, 85, `${data.roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
+        this.add.text(width / 2 + 210, 85, `${data.players[1].roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
 
         this.add.text(240, height / 6, "Lobby Information", {fontFamily : "blazma", fontSize : "72px"});
 
@@ -88,15 +102,7 @@ export default class GameStartScene extends Phaser.Scene {
             socket.emit('startGame');
             this.sound.play('button-press-sound');
             buttonPress('options-atlas','start', startBtn);
-            fadeOut('game', this);
         });
-
-        // --------------------------------------------    Player Icons     ---------------------------------------------------------
-
-        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 225, 400, 75, 10);
-        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 350, 400, 75, 10);
-        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 475, 400, 75, 10);
-        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 600, 400, 75, 10);
 
         // --------------------------------------------    Transitions     ---------------------------------------------------------
         
