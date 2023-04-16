@@ -84,7 +84,7 @@ export default class TitleScene extends Phaser.Scene {
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'host', hostBtn);
 
-            const nickname = limitedPrompt("What's your username? (10 characters max)", 10);
+            const nickname = limitedPrompt("What's your username? (9 characters max)", 9);
             socket.emit('createRoom', nickname);
         });
         
@@ -93,7 +93,7 @@ export default class TitleScene extends Phaser.Scene {
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'join', joinBtn);
 
-            const nickname = limitedPrompt("What's your username? (10 characters max)", 10);
+            const nickname = limitedPrompt("What's your username? (9 characters max)", 9);
             socket.emit('joinRoom', input.node.value, nickname);
         });
 
