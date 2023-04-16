@@ -54,6 +54,9 @@ export default class GameStartScene extends Phaser.Scene {
 
         });
 
+        socket.on('startedGame', () => {
+            fadeOut('game', this);
+        });
         
         // --------------------------------------------    Static Objects    -------------------------------------------------------
         
@@ -88,7 +91,6 @@ export default class GameStartScene extends Phaser.Scene {
             socket.emit('startGame');
             this.sound.play('button-press-sound');
             buttonPress('options-atlas','start', startBtn);
-            fadeOut('game', this);
         });
 
         // --------------------------------------------    Player Icons     ---------------------------------------------------------

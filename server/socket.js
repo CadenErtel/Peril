@@ -44,7 +44,9 @@ module.exports = function(io) {
         // ============================ OPTIONS ==============================
 
         socket.on('startGame', () => {
-
+            const roomCode = socket.data.roomCode;
+            rooms[roomCode].started = true;
+            io.to(roomCode).emit('startedGame');
         });
 
         // ============================ DISCONNECTS ==============================
