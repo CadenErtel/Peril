@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import {io} from "socket.io-client";
-import { fadeOut, buttonPress } from '../common';
+import { fadeOut, buttonPress, limitedPrompt } from '../common';
 
 
 export default class TitleScene extends Phaser.Scene {
@@ -81,28 +81,30 @@ export default class TitleScene extends Phaser.Scene {
         
         const hostBtn = this.add.sprite(width / 3, 10 * height / 21, 'title-atlas', 'host-button-up').setInteractive();
         hostBtn.on('pointerdown', () => {
-            socket.emit('createRoom');
-
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'host', hostBtn);
+
+            const nickname = limitedPrompt("What's your username? (10 characters max)", 10);
+            socket.emit('createRoom', nickname);
         });
         
         const joinBtn = this.add.sprite(2 * width / 3, 3 * height / 7, 'title-atlas', 'join-button-up').setInteractive();
-        joinBtn.on('pointerdown', () => {  
-            socket.emit('joinRoom', input.node.value);
-            
+        joinBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'join', joinBtn);
+
+            const nickname = limitedPrompt("What's your username? (10 characters max)", 10);
+            socket.emit('joinRoom', input.node.value, nickname);
         });
 
-        socket.on('roomCreated', (roomCode) => {
-            console.log(`Room created with code ${roomCode}`);
-            fadeOut('options', this, {socket : socket, roomCode : roomCode, currPlayers : 1, host : true});
+        socket.on('roomCreated', (players) => {
+            console.log(`Room created with code ${players[1].roomCode}`);
+            fadeOut('options', this, {socket : socket, players : players, host : true});
         });
         
-        socket.on('roomJoined', (data) => {
-            console.log(`Room joined with code ${data[0]}`);
-            fadeOut('options', this, {socket : socket, roomCode : data[0], currPlayers : data[1], host : data[2]});
+        socket.on('roomJoined', (players) => {
+            console.log(`Room joined with code ${players[1].roomCode}`);
+            fadeOut('options', this, {socket : socket, players : players, host : false});
         });
         
         socket.on('error', (message) => {
