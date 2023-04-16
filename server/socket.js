@@ -101,6 +101,7 @@ module.exports = function(io) {
                 socket.data.player--;
                 if (socket.data.player === 1){
                     socket.data.host = true;
+                    io.to(roomCode).emit('updateHost', socket.id);
                 }
             }
         }
