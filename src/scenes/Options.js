@@ -44,6 +44,16 @@ export default class GameStartScene extends Phaser.Scene {
                 this.players[i].setVisible(false);
             }
         });
+
+        socket.on('updateHost', (newHost) => {
+
+            // if the clients id matches the new hosts id
+            if (newHost === socket.id) {
+                startBtn.setInteractive()
+            } 
+
+        });
+
         
         // --------------------------------------------    Static Objects    -------------------------------------------------------
         
