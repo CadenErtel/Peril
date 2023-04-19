@@ -18,6 +18,8 @@ export default class GameScene extends Phaser.Scene {
             // wrap this line inside this if block
             this.cameras.main.fadeIn(500, 0, 0, 0)
         }
+
+        console.log(data.players);
         
         // --------------------------------------------    Buttons     ---------------------------------------------------------
 
