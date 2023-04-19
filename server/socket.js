@@ -4,7 +4,7 @@ module.exports = function(io) {
     io.on('connection', (socket) => {
 
         socket.on('clientTurnEnd', (clientData) => {
-            console.log(clientData[0]);
+            console.log(clientData);
         });
 
         // ============================ TITLE ==============================

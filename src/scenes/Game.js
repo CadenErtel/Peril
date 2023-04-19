@@ -65,12 +65,13 @@ export default class GameScene extends Phaser.Scene {
 
         // make a small grid of 20 boxes
         const boxes = [];
+        const clientData = [];
         for (let i = 0; i < 4; i++) {
             boxes.push([]);
             for (let j = 0; j < 5; j++) {
                 boxes[i].push(this.add.sprite((j * width / 6) + 320, (i * height / 4) + 120, 'menu-box').setInteractive());
                 boxes[i][j].scale = 0.25;
-                let name = '{' + (j+1) + ',' + (i+1) + '}';
+                let name = '{' + (j + 1) + ',' + (i + 1) + '}';
                 var value = 0;
                 const box_text = addText(this, boxes[i][j], name, '32px', '#ff0');
                 const box_value = addText(this, boxes[i][j], value, '28px', '#0f0');
@@ -81,20 +82,19 @@ export default class GameScene extends Phaser.Scene {
                     var num = num + 1;
                     replaceText(boxes[i][j], box_value, num.toString());
                     colorTransition(this, boxes[i][j], 0xffffff, 0xff00ff);
+
+                    // Update clientData for the corresponding box
+                    const boxIndex = i * 5 + j; // Calculate the index of the box in 1D array
+                    clientData[boxIndex].troops = num;
+
+                    // Send updated data to the server
+                    socket.emit('clientTurnEnd', clientData);
                 });
-                
+
+                // Initialize clientData with box name and initial troops value
+                const boxData = { box: name, troops: value };
+                clientData.push(boxData);
             }
         }
-        console.log(boxes);
-
-        // clients
-        const clientData = [
-            { box: '0', troops: boxes[0][0] }
-        ];
-
-        // send some data to the server
-        socket.emit('clientTurnEnd', clientData);
-
-
     }
 }
