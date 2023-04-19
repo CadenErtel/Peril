@@ -5,6 +5,7 @@ module.exports = function(io) {
 
         socket.on('clientTurnEnd', (clientData) => {
             console.log(clientData);
+            io.emit('serverTurnEnd', clientData);
         });
 
         // ============================ TITLE ==============================

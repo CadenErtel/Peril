@@ -79,7 +79,7 @@ export default class OptionsScene extends Phaser.Scene {
         });
 
         socket.on('startedGame', () => {
-            fadeOut('game', this, {socket : socket, players : this.playerData});
+            fadeOut('game', this, {socket : socket, players : this.playerData, player: { color : "0x33ee05"}});
         });
         
         // --------------------------------------------    Static Objects    -------------------------------------------------------

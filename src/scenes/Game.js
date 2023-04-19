@@ -21,72 +21,36 @@ export default class GameScene extends Phaser.Scene {
         }
 
         console.log(data.players);
-        
-        // --------------------------------------------    Buttons     ---------------------------------------------------------
-
-        // const button = this.add.sprite(width / 2, height / 2, 'title-atlas', 'host-button-up').setInteractive();
-        // button.on('pointerdown', () => {
-        //     this.scene.start('title');
-        // });
-
-        // const buttonJoin = this.add.sprite(width / 2, height / 4, 'title-atlas', 'join-button-up').setInteractive();
-        // buttonJoin.on('pointerdown', () => {
-        //     colorTransition(this, box1, 0xffffff, 0xff0000);
-        //     colorTransition(this, box2, 0xffffff, 0x00ff00); 
-        //     colorTransition(this, box3, 0xffffff, 0x0000ff); 
-        //     shakeScreen(this, 200, .02);
-        // });
-
-
-        // --------------------------------------------    Static Objects     --------------------------------------------------
-
-        // const box1 = this.add.sprite(width / 4, 3 * height / 4, 'menu-box').setInteractive();
-        // box1.scale = .25;
-        // const box1Text = addText(this, box1, '5', '64px', '#f0f');
-        // box1.on('pointerdown', () => {
-        //     var num = parseInt(box1Text.text);
-        //     var num = num - 1;
-        //     replaceText(box1, box1Text, num.toString());
-        //     colorTransition(this, box1, 0xffffff, 0xff00ff);
-        //     shakeScreen(this, 200, .02);
-        // });
-
-        // const box2 = this.add.sprite(2*width / 4, 3 * height / 4, 'menu-box').setInteractive();
-        // box2.scale = .25;
-        // const box2Text = addText(this, box2, '15', '32px', '#ff0');
-        // box2Text.setColor('#f0f');
-
-        // const box3 = this.add.sprite(3*width / 4, 3 * height / 4, 'menu-box').setInteractive();
-        // box3.scale = .25;
-        // const box3Text = addText(this, box3, '3', '48px', '#fff');
-        // box3Text.setText('8');
-
 
         // socket creation
         const socket = io();
+        
+        // --------------------------------------------    Game Start     ---------------------------------------------------------
+
+        // must initialize the board as zero for every player
 
         // make a small grid of 20 boxes
         const boxes = [];
         const clientData = [];
+
         for (let i = 0; i < 4; i++) {
             boxes.push([]);
             for (let j = 0; j < 5; j++) {
-                boxes[i].push(this.add.sprite((j * width / 6) + 320, (i * height / 4) + 120, 'menu-box').setInteractive());
-                boxes[i][j].scale = 0.25;
+                const box = this.add.sprite((j * width / 6) + 320, (i * height / 4) + 120, 'menu-box').setInteractive();
+                box.scale = 0.25;
                 let name = '{' + (j + 1) + ',' + (i + 1) + '}';
                 var value = 0;
-                const box_text = addText(this, boxes[i][j], name, '32px', '#ff0');
-                const box_value = addText(this, boxes[i][j], value, '28px', '#0f0');
-                box_text.setColor('#f0f');
+                const box_value = addText(this, box, value, '28px', '#0f0');
+                box.box_value = box_value; // Store box_value as a property of box
 
-                boxes[i][j].on('pointerdown', () => {
-                    var num = parseInt(box_value.text);
+                box.on('pointerdown', () => {
+                    var num = parseInt(box.box_value.text); // Access box_value from the property of box
                     var num = num + 1;
-                    replaceText(boxes[i][j], box_value, num.toString());
-                    colorTransition(this, boxes[i][j], 0xffffff, 0xff00ff);
+                    replaceText(box, box.box_value, num.toString()); // Access box_value from the property of box
+                    colorTransition(this, box, 0xffffff, data.player.color);
 
                     // Update clientData for the corresponding box
-                    const boxIndex = i * 5 + j; // Calculate the index of the box in 1D array
+                    const boxIndex = i * 5 + j;
                     clientData[boxIndex].troops = num;
 
                     // Send updated data to the server
@@ -96,7 +60,24 @@ export default class GameScene extends Phaser.Scene {
                 // Initialize clientData with box name and initial troops value
                 const boxData = { box: name, troops: value };
                 clientData.push(boxData);
+
+                boxes[i].push(box);
             }
         }
+        
+        // --------------------------------------------    Each Turn     --------------------------------------------------
+
+        // this is where the data within the boxes should be updated with each call
+        socket.on('serverTurnEnd', (updatedClientData) => {
+            // Update the values of the boxes based on the updated clientData received from the server
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 5; j++) {
+                    const boxIndex = i * 5 + j; // Calculate the index of the box in 1D array
+                    const num = updatedClientData[boxIndex].troops; // Get the updated troops value from updatedClientData
+                    replaceText(boxes[i][j], boxes[i][j].box_value, num.toString()); // Update the text on the box with the new value
+                }
+            }
+        });
     }
+
 }
