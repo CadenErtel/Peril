@@ -70,9 +70,9 @@ export function limitedPrompt(message, maxLength) {
     let value = '';
 
     while (value.length > maxLength || value === '') {
-      value = prompt(message);
-      if (value == null) {
-        return value;
+        value = prompt(message);
+        if (value == null) {
+            return value;
         }
     }
   
