@@ -3,6 +3,10 @@ const rooms = {};
 module.exports = function(io) {
     io.on('connection', (socket) => {
 
+        socket.on('clientTurnEnd', (clientData) => {
+            console.log(clientData[0]);
+        });
+
         // ============================ TITLE ==============================
 
         socket.on('createRoom', (nickname) => {

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import {io} from "socket.io-client";
 import { addText, colorTransition, replaceText, shakeScreen } from '../common';
 
 export default class GameScene extends Phaser.Scene {
@@ -59,17 +60,41 @@ export default class GameScene extends Phaser.Scene {
         // box3Text.setText('8');
 
 
+        // socket creation
+        const socket = io();
+
         // make a small grid of 20 boxes
-        for (let i = 4; i > 0; i--) {
-            for (let j = 5; j > 0; j--) {
-                const box = this.add.sprite((j * width / 6) + 20, i * height / 5, 'menu-box').setInteractive();
-                box.scale = 0.25;
-                let name = '{' + j + ', ' + i + '}';
-                const box_text = addText(this, box, name, '32px', '#ff0');
+        const boxes = [];
+        for (let i = 0; i < 4; i++) {
+            boxes.push([]);
+            for (let j = 0; j < 5; j++) {
+                boxes[i].push(this.add.sprite((j * width / 6) + 320, (i * height / 4) + 120, 'menu-box').setInteractive());
+                boxes[i][j].scale = 0.25;
+                let name = '{' + (j+1) + ',' + (i+1) + '}';
+                var value = 0;
+                const box_text = addText(this, boxes[i][j], name, '32px', '#ff0');
+                const box_value = addText(this, boxes[i][j], value, '28px', '#0f0');
                 box_text.setColor('#f0f');
+
+                boxes[i][j].on('pointerdown', () => {
+                    var num = parseInt(box_value.text);
+                    var num = num + 1;
+                    replaceText(boxes[i][j], box_value, num.toString());
+                    colorTransition(this, boxes[i][j], 0xffffff, 0xff00ff);
+                });
                 
             }
         }
+        console.log(boxes);
+
+        // clients
+        const clientData = [
+            { box: '0', troops: boxes[0][0] }
+        ];
+
+        // send some data to the server
+        socket.emit('clientTurnEnd', clientData);
+
 
     }
 }
