@@ -68,9 +68,12 @@ export function replaceText(sprite, textObject, text) {
 
 export function limitedPrompt(message, maxLength) {
     let value = '';
-  
+
     while (value.length > maxLength || value === '') {
-      value = prompt(message);
+        value = prompt(message);
+        if (value == null) {
+            return value;
+        }
     }
   
     return value;

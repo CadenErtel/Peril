@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {fadeOut, buttonPress} from '../common';
 
-export default class GameStartScene extends Phaser.Scene {
+export default class OptionsScene extends Phaser.Scene {
     
     constructor() {
         super('options');
@@ -12,6 +12,7 @@ export default class GameStartScene extends Phaser.Scene {
         this.load.atlas('options-atlas', 'assets/atlas/options/buttons.png', 'assets/atlas/options/buttons.json');
 
         this.players = [];
+        this.playerData = {};
 
         for (let i = 0; i < 4; i++){
             const rect = this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect(1235, 225 + (i*125), 400, 75, 10);
@@ -28,9 +29,15 @@ export default class GameStartScene extends Phaser.Scene {
     
     create(data) {
 
+        this.playerData = data.players;
+
         for (let i = 0; i < Object.keys(data.players).length; i++){
             console.log(data.players[i+1].nickname);
-            this.players[i].setText(data.players[i+1].nickname);
+            let nickname = data.players[i+1].nickname;
+            if (i === 0){
+                nickname = "♕" + nickname;
+            }
+            this.players[i].setText(nickname);
             this.players[i].setVisible(true);
         }
 
@@ -43,11 +50,17 @@ export default class GameStartScene extends Phaser.Scene {
 
         socket.on('newPlayer', (players) => {
 
+            this.playerData = players;
+
             const count = Object.keys(players).length;
             console.log("New Player Joined or Left!");
 
             for (let i = 0; i < count; i++){
-                this.players[i].setText(players[i+1].nickname);
+                let nickname = players[i+1].nickname;
+                if (i === 0){
+                    nickname = "♕" + nickname;
+                }
+                this.players[i].setText(nickname);
                 this.players[i].setVisible(true);
             }
 
@@ -66,7 +79,7 @@ export default class GameStartScene extends Phaser.Scene {
         });
 
         socket.on('startedGame', () => {
-            fadeOut('game', this);
+            fadeOut('game', this, {socket : socket, players : this.playerData});
         });
         
         // --------------------------------------------    Static Objects    -------------------------------------------------------
