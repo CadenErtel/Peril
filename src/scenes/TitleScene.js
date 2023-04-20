@@ -73,6 +73,9 @@ export default class TitleScene extends Phaser.Scene {
         
             // If the click occurred outside of the input field, unfocus it
             if (clickedOutsideInput) {
+                if (input.node.value === '') {
+                    input.node.value = 'Enter Code';
+                }
                 input.node.blur();
             }
         });
