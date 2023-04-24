@@ -5,7 +5,8 @@ module.exports = function(io) {
 
         socket.on('clientTurnEnd', (clientData) => {
             console.log(clientData);
-            io.emit('serverTurnEnd', clientData);
+            const roomCode = socket.data.roomCode;
+            io.to(roomCode).emit('serverTurnEnd', clientData);
         });
 
         // ============================ TITLE ==============================

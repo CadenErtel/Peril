@@ -23,7 +23,8 @@ export default class GameScene extends Phaser.Scene {
         console.log(data.players);
 
         // socket creation
-        const socket = io();
+        const socket = data.socket;
+        console.log(socket);
         
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
@@ -69,6 +70,7 @@ export default class GameScene extends Phaser.Scene {
 
         // this is where the data within the boxes should be updated with each call
         socket.on('serverTurnEnd', (updatedClientData) => {
+            console.log(updatedClientData);
             // Update the values of the boxes based on the updated clientData received from the server
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 5; j++) {
