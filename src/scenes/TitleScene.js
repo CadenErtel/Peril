@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import {io} from "socket.io-client";
 import { fadeOut, buttonPress, limitedPrompt } from '../common';
 
-
 export default class TitleScene extends Phaser.Scene {
     constructor() {
         super('title');
@@ -15,7 +14,9 @@ export default class TitleScene extends Phaser.Scene {
         this.load.atlas('title-atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
 
-        this.load.json('hitboxes', 'assets/test.json');
+        this.load.json('countries', 'assets/countries.json');
+
+        this.load.image('al', "assets/alberta.png");
     }
     
     create(data) {
@@ -46,11 +47,6 @@ export default class TitleScene extends Phaser.Scene {
         image.displayWidth = width;
         image.displayHeight = height;
 
-        // const hitbody = this.matter.add.fromPhysicsEditor(width / 2, height / 6, this.cache.json.get('hitboxes').title);
-        // const hitbody = this.matter.add.fromPhysicsEditor(width / 2, height / 6, this.cache.json.get('hitboxes')["menu-box"]);
-        // const title = this.add.sprite(width / 2, height / 6, 'title', null, hitbody);
-        // const hitboxes = this.cache.json.get('hitboxes');
-
         function sortPointsClockwise(points) {
             const centroid = {
               x: points.reduce((sum, p) => sum + p.x, 0) / points.length,
@@ -73,25 +69,28 @@ export default class TitleScene extends Phaser.Scene {
             return points;
         }
 
+        const mouseConstraint = this.matter.add.mouseSpring();
 
+        // const points_1 = [].concat(...this.cache.json.get('alberta').alberta.fixtures[0].vertices)
+        // const vertices_1 = sortPointsClockwise(points_1)
+        
+        // const alberta = this.matter.add.sprite(0,0, 'al').setOrigin(0,0);
+        // const al_body = this.matter.bodies.fromVertices(100, 100, vertices_1, {label: "alberta", isStatic: true});
+        // alberta.setExistingBody(al_body);
+        
+        // const points = [].concat(...this.cache.json.get('hitboxes').title.fixtures[0].vertices)
+        // const vertices = sortPointsClockwise(points)
+        // const title = this.matter.add.sprite(width / 2, height / 6, 'title');
+        // const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "title", isStatic: true});
 
-        const points = [].concat(...this.cache.json.get('hitboxes').title.fixtures[0].vertices)
+        // title.setExistingBody(body);
+
+        const points = [].concat(...this.cache.json.get('countries').northwest_territory.fixtures[0].vertices)
         const vertices = sortPointsClockwise(points)
-        console.log(vertices)
-
-        // Create the body using the vertices
-        // var body = this.matter.bodies.fromVertices(0, 0, vertices, null);
+        
         const title = this.matter.add.sprite(width / 2, height / 6, 'title');
-        const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {"isStatic": true});
-        body.scale = 1.5;
+        const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "test", isStatic: true});
         title.setExistingBody(body);
-        title.scale = 1.5;
-        title.setInteractive();
-        title.on('pointerdown', () => {
-
-            console.log("Clicked!");
-        });
-
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
@@ -114,10 +113,16 @@ export default class TitleScene extends Phaser.Scene {
         });
 
         // Allows the unfocusing of the text field
-        this.input.on('pointerdown', (_, gameObjects) => {
+        this.input.on('pointerdown', (pointer, gameObjects) => {
             // Check if the click occurred outside of the input field
+
+            // console.log(this.matter.query.point([body, al_body], {x:pointer.worldX, y:pointer.worldY}))
+            const clickedBody = this.matter.query.point([body], {x:pointer.worldX, y:pointer.worldY});
+            console.log(clickedBody)
+            console.log(clickedBody[0]);
+
             const clickedOutsideInput = !gameObjects.find(gameObject => gameObject.node === input.node);
-        
+
             // If the click occurred outside of the input field, unfocus it
             if (clickedOutsideInput) {
                 if (input.node.value === '') {
