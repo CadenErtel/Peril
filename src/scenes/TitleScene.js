@@ -14,6 +14,8 @@ export default class TitleScene extends Phaser.Scene {
         
         this.load.atlas('title-atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
+
+        this.load.json('hitboxes', 'assets/test.json');
     }
     
     create(data) {
@@ -43,8 +45,53 @@ export default class TitleScene extends Phaser.Scene {
         let image = this.add.image(0, 0, 'background').setOrigin(0,0);
         image.displayWidth = width;
         image.displayHeight = height;
-        
-        this.add.image(width / 2, height / 6, 'title').scale = 1.5;
+
+        // const hitbody = this.matter.add.fromPhysicsEditor(width / 2, height / 6, this.cache.json.get('hitboxes').title);
+        // const hitbody = this.matter.add.fromPhysicsEditor(width / 2, height / 6, this.cache.json.get('hitboxes')["menu-box"]);
+        // const title = this.add.sprite(width / 2, height / 6, 'title', null, hitbody);
+        // const hitboxes = this.cache.json.get('hitboxes');
+
+        function sortPointsClockwise(points) {
+            const centroid = {
+              x: points.reduce((sum, p) => sum + p.x, 0) / points.length,
+              y: points.reduce((sum, p) => sum + p.y, 0) / points.length
+            };
+            
+            points.sort((a, b) => {
+              const angleA = Math.atan2(a.y - centroid.y, a.x - centroid.x);
+              const angleB = Math.atan2(b.y - centroid.y, b.x - centroid.x);
+              
+              if (angleA < angleB) return -1;
+              if (angleA > angleB) return 1;
+              
+              // if angles are equal, break the tie by distance to centroid
+              const distanceA = Math.sqrt((a.x - centroid.x)**2 + (a.y - centroid.y)**2);
+              const distanceB = Math.sqrt((b.x - centroid.x)**2 + (b.y - centroid.y)**2);
+              return distanceA - distanceB;
+            });
+            
+            return points;
+        }
+
+
+
+        const points = [].concat(...this.cache.json.get('hitboxes').title.fixtures[0].vertices)
+        const vertices = sortPointsClockwise(points)
+        console.log(vertices)
+
+        // Create the body using the vertices
+        // var body = this.matter.bodies.fromVertices(0, 0, vertices, null);
+        const title = this.matter.add.sprite(width / 2, height / 6, 'title');
+        const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {"isStatic": true});
+        body.scale = 1.5;
+        title.setExistingBody(body);
+        title.scale = 1.5;
+        title.setInteractive();
+        title.on('pointerdown', () => {
+
+            console.log("Clicked!");
+        });
+
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
