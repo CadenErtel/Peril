@@ -65,13 +65,29 @@ export default class GameScene extends Phaser.Scene {
         }
 
         socket.on('setupTerritories', (updatedMapData) => {
-            for (let i = 0; i < numPlayers; i++){
+            for (let i = 0; i < Object.keys(data.players).length; i++){
                 this.playerGroups[i+1] = [];
+            }
+
+            for (const key in updatedMapData){
+                const currBox = this.mapData[key].sprite;
+                const updatedBoxData = updatedMapData[key];
+                replaceText(currBox, currBox.textObj, updatedBoxData.troops.toString());
+                colorTransition(this, currBox, currBox.data.color, updatedBoxData.color);
+                currBox.data.troops = updatedBoxData.troops;
+                currBox.data.color = updatedBoxData.color;
+                currBox.data.owner = updatedBoxData.owner;
+                this.playerGroups[updatedBoxData.owner].push(currBox.data.id);
             }
         });
 
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
+        const nextBtn = this.add.sprite(1835, 975, 'options-atlas', 'back-button-up').setInteractive();
+        nextBtn.setScale(1, -1);
+        nextBtn.on('pointerdown', () => {
+            this.sound.play('button-press-sound');
+        });
 
         for (const key in this.mapData){
             const box = this.mapData[key].sprite;

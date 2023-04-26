@@ -57,7 +57,7 @@ module.exports = function(io) {
 
         socket.on('setup', (clientData) =>{
             const roomCode = socket.data.roomCode;
-            socket.to(roomCode).emit('serverUpdate', clientData);
+            socket.to(roomCode).emit('setupTerritories', clientData);
         });
 
         // ============================ DISCONNECTS ==============================
