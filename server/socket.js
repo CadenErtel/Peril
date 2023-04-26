@@ -64,7 +64,7 @@ module.exports = function(io) {
         socket.on('endTurn', () => {
             const roomCode = socket.data.roomCode;
             rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;
-            socket.to(roomCode).emit('nextTurn', rooms[roomCode].turn);
+            io.to(roomCode).emit('nextTurn', rooms[roomCode].turn);
         });
 
         // ============================ DISCONNECTS ==============================

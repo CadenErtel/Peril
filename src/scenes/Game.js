@@ -62,6 +62,9 @@ export default class GameScene extends Phaser.Scene {
         renderTerritories(this, 4, 6);
         if (this.myPlayer.host) {
             randomizeTerritories(this, socket, this.mapData, data.players);
+            for (const key in this.mapData){
+                this.mapData[key].sprite.setInteractive();
+            }
         }
 
         socket.on('setupTerritories', (updatedMapData) => {
@@ -94,7 +97,16 @@ export default class GameScene extends Phaser.Scene {
 
             if (data.players[this.turn].id === this.myPlayer.id) {
                 console.log("ITS MY TURRN!!!!!!");
+                for (const key in this.mapData){
+                    this.mapData[key].sprite.setInteractive();
+                }
                 //TODO make player groups and make them interactable
+            } else {
+                for (const key in this.mapData){
+                    
+                    this.mapData[key].sprite.disableInteractive();
+                    console.log(this.mapData[key].sprite);
+                }
             }
         });
 
@@ -141,7 +153,7 @@ const renderTerritories = (scene, rows, cols) => {
     for (let i = 0; i < rows; i++) {
         for (let j = 0; j < cols; j++) {
             
-            const box = scene.add.sprite((j * scene.sys.game.config.width / 7) + 274, (i * scene.sys.game.config.height / 5) + 120, 'menu-box').setInteractive();
+            const box = scene.add.sprite((j * scene.sys.game.config.width / 7) + 274, (i * scene.sys.game.config.height / 5) + 120, 'menu-box');
             const box_value = addText(scene, box, 0, '28px', '#0f0');
             
             box.scale = 0.25;
