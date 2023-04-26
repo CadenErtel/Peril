@@ -119,9 +119,9 @@ export default class TitleScene extends Phaser.Scene {
             // Check if the click occurred outside of the input field
 
             // console.log(this.matter.query.point([body, al_body], {x:pointer.worldX, y:pointer.worldY}))
-            const clickedBody = this.matter.query.point([body], {x:pointer.worldX, y:pointer.worldY});
-            console.log(clickedBody)
-            console.log(clickedBody[0]);
+            // const clickedBody = this.matter.query.point([body], {x:pointer.worldX, y:pointer.worldY});
+            // console.log(clickedBody)
+            // console.log(clickedBody[0]);
 
             const clickedOutsideInput = !gameObjects.find(gameObject => gameObject.node === input.node);
 

@@ -55,7 +55,7 @@ module.exports = function(io) {
 
         // ============================ GAME ==============================
 
-        socket.on('update', (clientData) =>{
+        socket.on('setup', (clientData) =>{
             const roomCode = socket.data.roomCode;
             socket.to(roomCode).emit('serverUpdate', clientData);
         });

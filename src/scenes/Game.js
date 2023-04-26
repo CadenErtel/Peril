@@ -26,11 +26,17 @@ export default class GameScene extends Phaser.Scene {
             "17": { "sprite" : null, "adjacent" : [] },
             "18": { "sprite" : null, "adjacent" : [] },
             "19": { "sprite" : null, "adjacent" : [] },
-            "20": { "sprite" : null, "adjacent" : [] }
+            "20": { "sprite" : null, "adjacent" : [] },
+            "21": { "sprite" : null, "adjacent" : [] },
+            "22": { "sprite" : null, "adjacent" : [] },
+            "23": { "sprite" : null, "adjacent" : [] },
+            "24": { "sprite" : null, "adjacent" : [] }
           }
 	}
 
-    preload () {     
+    preload () {
+        this.turn = 1;
+        this.playerGroups = {};    
     }
     
     create(data) {
@@ -52,41 +58,17 @@ export default class GameScene extends Phaser.Scene {
         }
         
         // --------------------------------------------    Static Objects     --------------------------------------------------
-        const rows = 4;
-        const cols = 5;
         
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < cols; j++) {
-                
-                const box = this.add.sprite((j * width / 6) + 320, (i * height / 5) + 120, 'menu-box').setInteractive();
-                const box_value = addText(this, box, 0, '28px', '#0f0');
-                
-                box.scale = 0.25;
-                box.data = {};
-                box.data.id =  (i * cols + j) + 1;
-                box.data.owner = null;
-                box.data.color = 0xffffff;
-                box.data.troops = 0;
-                box.textObj = box_value; // Store box_value as a property of box
-                
-                this.mapData[box.data.id].sprite = box;
-
-                if (j > 0){ // left
-                    this.mapData[box.data.id - 1].adjacent.push(box);
-                }
-                if (j < cols - 1){ // right
-                    this.mapData[box.data.id + 1].adjacent.push(box);
-                }
-                if (i > 0){ // above
-                    this.mapData[box.data.id - cols].adjacent.push(box);
-                }
-                if (i < rows - 1){ //below
-                    this.mapData[box.data.id + cols].adjacent.push(box);
-                }
-
-            }
+        renderTerritories(this, 4, 6);
+        if (this.myPlayer.host) {
+            randomizeTerritories(this, socket, this.mapData, data.players);
         }
 
+        socket.on('setupTerritories', (updatedMapData) => {
+            for (let i = 0; i < numPlayers; i++){
+                this.playerGroups[i+1] = [];
+            }
+        });
 
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
@@ -128,4 +110,73 @@ export default class GameScene extends Phaser.Scene {
             }
         });
     }
+}
+
+const renderTerritories = (scene, rows, cols) => {
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            
+            const box = scene.add.sprite((j * scene.sys.game.config.width / 7) + 274, (i * scene.sys.game.config.height / 5) + 120, 'menu-box').setInteractive();
+            const box_value = addText(scene, box, 0, '28px', '#0f0');
+            
+            box.scale = 0.25;
+            box.data = {};
+            box.data.id =  (i * cols + j) + 1;
+            box.data.owner = null;
+            box.data.color = 0xffffff;
+            box.data.troops = 0;
+            box.textObj = box_value; // Store box_value as a property of box
+            
+            scene.mapData[box.data.id].sprite = box;
+
+            if (j > 0){ // left
+                scene.mapData[box.data.id - 1].adjacent.push(box);
+            }
+            if (j < cols - 1){ // right
+                scene.mapData[box.data.id + 1].adjacent.push(box);
+            }
+            if (i > 0){ // above
+                scene.mapData[box.data.id - cols].adjacent.push(box);
+            }
+            if (i < rows - 1){ //below
+                scene.mapData[box.data.id + cols].adjacent.push(box);
+            }
+
+        }
+    }
+}
+
+const randomizeTerritories = (scene, socket, mapData, players) => {
+    const numTerritories = Object.keys(mapData).length;
+    const numPlayers = Object.keys(players).length;
+
+    for (let i = 1; i < numPlayers + 1; i++){
+        scene.playerGroups[i] = [];
+    }
+
+    for (let i = 0; i < numTerritories / numPlayers; i++){
+        for (let j = 1; j < numPlayers + 1; j++){
+
+            let num = Math.floor(Math.random() * numTerritories) + 1;
+            let currSprite = mapData[num].sprite;
+
+            console.log(currSprite);
+            while (currSprite.data.owner != null) {
+                num = (num % numTerritories) + 1;
+                currSprite = mapData[num].sprite;
+            }
+            currSprite.data.owner = j;
+            colorTransition(scene, currSprite, currSprite.data.color, players[j].color);
+            currSprite.data.color =  players[j].color;
+            scene.playerGroups[j].push(currSprite.data.id);
+        }
+    }
+
+    // Send updated data to the server
+    const newData = {};
+    for (const key in mapData){
+        newData[key] = mapData[key].sprite.data;
+    }
+
+    socket.emit('setup', newData);
 }
