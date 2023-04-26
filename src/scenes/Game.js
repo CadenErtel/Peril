@@ -84,9 +84,18 @@ export default class GameScene extends Phaser.Scene {
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
         const nextBtn = this.add.sprite(1835, 975, 'options-atlas', 'back-button-up').setInteractive();
-        nextBtn.setScale(1, -1);
         nextBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
+            socket.emit('endTurn');
+        });
+
+        socket.on('nextTurn', (turnNum) => {
+            this.turn = turnNum;
+
+            if (data.players[this.turn].id === this.myPlayer.id) {
+                console.log("ITS MY TURRN!!!!!!");
+                //TODO make player groups and make them interactable
+            }
         });
 
         for (const key in this.mapData){
@@ -176,7 +185,6 @@ const randomizeTerritories = (scene, socket, mapData, players) => {
             let num = Math.floor(Math.random() * numTerritories) + 1;
             let currSprite = mapData[num].sprite;
 
-            console.log(currSprite);
             while (currSprite.data.owner != null) {
                 num = (num % numTerritories) + 1;
                 currSprite = mapData[num].sprite;

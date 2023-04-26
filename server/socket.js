@@ -50,14 +50,21 @@ module.exports = function(io) {
         socket.on('startGame', () => {
             const roomCode = socket.data.roomCode;
             rooms[roomCode].started = true;
+            rooms[roomCode].turn = 1;
             io.to(roomCode).emit('startedGame');
         });
 
         // ============================ GAME ==============================
 
-        socket.on('setup', (clientData) =>{
+        socket.on('setup', (clientData) => {
             const roomCode = socket.data.roomCode;
             socket.to(roomCode).emit('setupTerritories', clientData);
+        });
+
+        socket.on('endTurn', () => {
+            const roomCode = socket.data.roomCode;
+            rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;
+            socket.to(roomCode).emit('nextTurn', rooms[roomCode].turn);
         });
 
         // ============================ DISCONNECTS ==============================
