@@ -30,9 +30,7 @@ export default class GameScene extends Phaser.Scene {
           }
 	}
 
-    preload () {
-        this.boxes = [];
-        this.clientData = [];        
+    preload () {     
     }
     
     create(data) {
@@ -89,7 +87,6 @@ export default class GameScene extends Phaser.Scene {
             }
         }
 
-        console.log(this.mapData);
 
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
@@ -106,7 +103,6 @@ export default class GameScene extends Phaser.Scene {
                 box.data.owner = this.myPlayer.id;
 
                 // Send updated data to the server
-
                 const newData = {};
                 for (const key in this.mapData){
                     newData[key] = this.mapData[key].sprite.data;
@@ -120,9 +116,7 @@ export default class GameScene extends Phaser.Scene {
 
         // this is where the data within the boxes should be updated with each call
         socket.on('serverUpdate', (updatedMapData) => {
-            console.log(updatedMapData);
             // Update the values of the boxes based on the updated clientData received from the server
-
             for (const key in updatedMapData){
                 const currBox = this.mapData[key].sprite;
                 const updatedBoxData = updatedMapData[key];
