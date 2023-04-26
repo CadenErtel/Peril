@@ -47,7 +47,7 @@ export default class TitleScene extends Phaser.Scene {
         image.displayWidth = width;
         image.displayHeight = height;
 
-        console.log(image);
+        // console.log(image);
 
         function sortPointsClockwise(points) {
             const centroid = {
@@ -87,12 +87,12 @@ export default class TitleScene extends Phaser.Scene {
 
         // title.setExistingBody(body);
 
-        const points = [].concat(...this.cache.json.get('countries').northwest_territory.fixtures[0].vertices)
-        const vertices = sortPointsClockwise(points)
+        // const points = [].concat(...this.cache.json.get('countries').northwest_territory.fixtures[0].vertices)
+        // const vertices = sortPointsClockwise(points)
         
-        const title = this.matter.add.sprite(width / 2, height / 6, 'title');
-        const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "test", isStatic: true});
-        title.setExistingBody(body);
+        this.add.sprite(width / 2, height / 6, 'title').scale = 1.5;
+        // const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "test", isStatic: true});
+        // title.setExistingBody(body);
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
