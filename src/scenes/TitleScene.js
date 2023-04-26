@@ -43,9 +43,11 @@ export default class TitleScene extends Phaser.Scene {
 
         // --------------------------------------------    Static Images    -------------------------------------------------------
 
-        let image = this.add.image(0, 0, 'background').setOrigin(0,0);
+        const image = this.add.image(0, 0, 'background').setOrigin(0,0);
         image.displayWidth = width;
         image.displayHeight = height;
+
+        console.log(image);
 
         function sortPointsClockwise(points) {
             const centroid = {

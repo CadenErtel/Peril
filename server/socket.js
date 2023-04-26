@@ -17,6 +17,7 @@ module.exports = function(io) {
             socket.data.roomCode = roomCode;
             socket.data.player = 1;
             socket.data.host = true;
+            socket.data.color = assignColor(socket.data.player);
             playersToSocket(socket, 'roomCreated', roomCode);
             console.log(rooms);
         });
@@ -31,6 +32,7 @@ module.exports = function(io) {
                     socket.data.roomCode = roomCode;
                     socket.data.player = room.players;
                     socket.data.host = false;
+                    socket.data.color = assignColor(socket.data.player);
                     playersToSocket(socket, 'roomJoined', roomCode);
                     playersToRoom(socket, roomCode);
                 } else {
@@ -49,6 +51,13 @@ module.exports = function(io) {
             const roomCode = socket.data.roomCode;
             rooms[roomCode].started = true;
             io.to(roomCode).emit('startedGame');
+        });
+
+        // ============================ GAME ==============================
+
+        socket.on('update', (clientData) =>{
+            const roomCode = socket.data.roomCode;
+            socket.to(roomCode).emit('serverUpdate', clientData);
         });
 
         // ============================ DISCONNECTS ==============================
@@ -103,6 +112,7 @@ module.exports = function(io) {
         for (const socket of sockets) {
             if (socket.data.player > playerNumLeft) {
                 socket.data.player--;
+                socket.data.color = assignColor(socket.data.player);
                 if (socket.data.player === 1){
                     socket.data.host = true;
                     io.to(roomCode).emit('updateHost', socket.id);
@@ -128,12 +138,33 @@ module.exports = function(io) {
         const playerData = {}
 
         for (const socket of sockets) {
-            playerData[socket.data.player] = {nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode};
+            playerData[socket.data.player] = {id : socket.id, nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode, color : socket.data.color};
         }
 
         console.log(playerData);
 
         return playerData;
+    }
+
+    function assignColor(playerNum){
+        
+        switch (playerNum) {
+            case 1:
+                return 0xff0000;
+                break;
+            case 2:
+                return 0x0000ff;
+                break;
+            case 3:
+                return 0xffff00;
+                break;
+            case 4:    
+                return 0x00ff00;
+                break;
+            default:
+                return 0x808080;
+                break;
+        }
     }
 };
 
