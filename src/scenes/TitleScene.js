@@ -18,6 +18,7 @@ export default class TitleScene extends Phaser.Scene {
         this.load.json('states', 'assets/states.json');
 
         this.load.image('cali', "assets/california.png");
+        this.load.image('idaho', "assets/idaho.png");
     }
     
     create(data) {
@@ -71,10 +72,18 @@ export default class TitleScene extends Phaser.Scene {
         }
         
         const cali = this.cache.json.get('states').California
-        const title = this.matter.add.sprite(width / 2, height / 6, 'cali');
-        const testBody =  this.matter.add.fromPhysicsEditor(width/2, height/6, cali);
-        title.setExistingBody(testBody);
-        title.setScale(.5);
+        const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
+        const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
+        cali_img.setExistingBody(cali_body);
+        cali_img.setScale(.5);
+
+        const idaho = this.cache.json.get('states').idaho
+        const id_img = this.matter.add.sprite(1510, 100, 'idaho');
+        const id_body =  this.matter.add.fromPhysicsEditor(1510, 100, idaho);
+        id_img.setExistingBody(id_body);
+        id_img.setScale(.3);
+
+        this.add.image(width / 2, height / 6, 'title').setOrigin(.5).setScale(1.5);
 
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
@@ -105,7 +114,7 @@ export default class TitleScene extends Phaser.Scene {
             const clickedBody = this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position);
             if (clickedBody) {
                 clickedBody.forEach(body => {
-                    console.log(body);
+                    console.log(body.label);
                 });
             }
 
