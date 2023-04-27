@@ -15,8 +15,9 @@ export default class TitleScene extends Phaser.Scene {
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
 
         this.load.json('countries', 'assets/countries.json');
+        this.load.json('states', 'assets/states.json');
 
-        this.load.image('al', "assets/alberta.png");
+        this.load.image('cali', "assets/california.png");
     }
     
     create(data) {
@@ -47,8 +48,6 @@ export default class TitleScene extends Phaser.Scene {
         image.displayWidth = width;
         image.displayHeight = height;
 
-        // console.log(image);
-
         function sortPointsClockwise(points) {
             const centroid = {
               x: points.reduce((sum, p) => sum + p.x, 0) / points.length,
@@ -70,29 +69,13 @@ export default class TitleScene extends Phaser.Scene {
             
             return points;
         }
-
-        const mouseConstraint = this.matter.add.mouseSpring();
-
-        // const points_1 = [].concat(...this.cache.json.get('alberta').alberta.fixtures[0].vertices)
-        // const vertices_1 = sortPointsClockwise(points_1)
         
-        // const alberta = this.matter.add.sprite(0,0, 'al').setOrigin(0,0);
-        // const al_body = this.matter.bodies.fromVertices(100, 100, vertices_1, {label: "alberta", isStatic: true});
-        // alberta.setExistingBody(al_body);
-        
-        // const points = [].concat(...this.cache.json.get('hitboxes').title.fixtures[0].vertices)
-        // const vertices = sortPointsClockwise(points)
-        // const title = this.matter.add.sprite(width / 2, height / 6, 'title');
-        // const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "title", isStatic: true});
+        const cali = this.cache.json.get('states').California
+        const title = this.matter.add.sprite(width / 2, height / 6, 'cali');
+        const testBody =  this.matter.add.fromPhysicsEditor(width/2, height/6, cali);
+        title.setExistingBody(testBody);
+        title.setScale(.5);
 
-        // title.setExistingBody(body);
-
-        // const points = [].concat(...this.cache.json.get('countries').northwest_territory.fixtures[0].vertices)
-        // const vertices = sortPointsClockwise(points)
-        
-        this.add.sprite(width / 2, height / 6, 'title').scale = 1.5;
-        // const body = this.matter.bodies.fromVertices(width / 2, height / 6, vertices, {label: "test", isStatic: true});
-        // title.setExistingBody(body);
 
         // --------------------------------------------    Text Field     ---------------------------------------------------------
         
@@ -118,10 +101,13 @@ export default class TitleScene extends Phaser.Scene {
         this.input.on('pointerdown', (pointer, gameObjects) => {
             // Check if the click occurred outside of the input field
 
-            // console.log(this.matter.query.point([body, al_body], {x:pointer.worldX, y:pointer.worldY}))
-            // const clickedBody = this.matter.query.point([body], {x:pointer.worldX, y:pointer.worldY});
-            // console.log(clickedBody)
-            // console.log(clickedBody[0]);
+            console.log(this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position))
+            const clickedBody = this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position);
+            if (clickedBody) {
+                clickedBody.forEach(body => {
+                    console.log(body);
+                });
+            }
 
             const clickedOutsideInput = !gameObjects.find(gameObject => gameObject.node === input.node);
 
