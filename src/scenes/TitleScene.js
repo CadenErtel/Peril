@@ -49,7 +49,7 @@ export default class TitleScene extends Phaser.Scene {
         const image = this.add.image(0, 0, 'background').setOrigin(0,0);
         image.displayWidth = width;
         image.displayHeight = height;
-        
+
         // const cali = this.cache.json.get('states').California
         // const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
         // const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
@@ -72,12 +72,20 @@ export default class TitleScene extends Phaser.Scene {
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'host', hostBtn);
 
+            hostBtn.disableInteractive();
+            joinBtn.disableInteractive();
+
             Swal.fire({
                 backdrop: false,
                 title: 'Enter your Nickname!',
                 input: 'text',
                 inputAttributes: {
                   maxlength: 9,
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                      return 'You need to write something!'
+                    }
                 },
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
@@ -87,7 +95,10 @@ export default class TitleScene extends Phaser.Scene {
                     console.log('Text entered:', result.value);
                     socket.emit('createRoom', result.value);
                 }
+                hostBtn.setInteractive();
+                joinBtn.setInteractive();
             });
+
             
         });
         
@@ -96,25 +107,38 @@ export default class TitleScene extends Phaser.Scene {
             this.sound.play('button-press-sound');
             buttonPress('title-atlas', 'join', joinBtn);
 
+            hostBtn.disableInteractive();
+            joinBtn.disableInteractive();
+            
+
             Swal.fire({
                 backdrop: false,
                 title: 'Enter A Room Code!',
                 input: 'text',
                 inputAttributes: {
-                    maxlength: 7,
+                    maxlength: 7
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                      return 'You need to write something!'
+                    }
                 },
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
                 cancelButtonText: 'Cancel',
             }).then((roomResult) => {
                 if (roomResult.isConfirmed) {
-
                     Swal.fire({
                         backdrop: false,
                         title: 'Enter your Nickname!',
                         input: 'text',
                         inputAttributes: {
                           maxlength: 9,
+                        },
+                        inputValidator: (value) => {
+                            if (!value) {
+                              return 'You need to write something!'
+                            }
                         },
                         showCancelButton: true,
                         confirmButtonText: 'Submit',
@@ -123,8 +147,15 @@ export default class TitleScene extends Phaser.Scene {
                         if (nickName.isConfirmed) {
                             console.log('Text entered:', nickName.value);
                             socket.emit('joinRoom', roomResult.value.toUpperCase(), nickName.value);
+                        } else if (nickName.dismiss === Swal.DismissReason.cancel) {
+                            hostBtn.setInteractive();
+                            joinBtn.setInteractive();
                         }
                     });
+
+                } else if (roomResult.dismiss === Swal.DismissReason.cancel) {
+                    hostBtn.setInteractive();
+                    joinBtn.setInteractive();
                 }
             })
 
