@@ -50,18 +50,29 @@ export default class TitleScene extends Phaser.Scene {
         image.displayWidth = width;
         image.displayHeight = height;
 
-        // const cali = this.cache.json.get('states').California
-        // const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
-        // const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
-        // cali_img.setExistingBody(cali_body);
-        // cali_img.setScale(.5);
+        const cali = this.cache.json.get('states').California
+        const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
+        const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
+        cali_img.setExistingBody(cali_body);
+        cali_img.setScale(.5);
 
-        // const idaho = this.cache.json.get('states').idaho
-        // const id_img = this.matter.add.sprite(1510, 100, 'idaho');
-        // const id_body =  this.matter.add.fromPhysicsEditor(1510, 100, idaho);
-        // id_img.setExistingBody(id_body);
-        // id_img.setScale(.3);
-        // id_img.setTint(0x00FF00);
+        const idaho = this.cache.json.get('states').idaho
+        const id_img = this.matter.add.sprite(1510, 100, 'idaho');
+        const id_body =  this.matter.add.fromPhysicsEditor(1510, 100, idaho);
+        id_img.setExistingBody(id_body);
+        id_img.setScale(.3);
+        id_img.setTint(0x00FF00);
+
+        this.input.on('pointerdown', (pointer) => {
+            const clickedBody = this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position);
+            if (clickedBody) {
+                clickedBody.forEach(body => {
+                    console.log(body);
+                    console.log(body.label);
+                });
+            }	            
+        });
+
 
         this.add.image(width / 2, height / 6, 'title').setOrigin(.5).setScale(1.5);
 

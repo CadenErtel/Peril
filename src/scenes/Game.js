@@ -124,12 +124,14 @@ export default class GameScene extends Phaser.Scene {
                 console.log("go to fortify");
                 currText[1].setTint(0xFFFFFF);
                 currText[2].setTint(0x00FF00);
+                attack();
             }
             else if (this.stage === "fortify") {
                 this.stage = "deploy";
                 console.log("go to next turn");
                 currText[2].setTint(0xFFFFFF);
                 currText[0].setTint(0x00FF00);
+                fortify();
                 socket.emit('endTurn');
             }
             
@@ -150,6 +152,10 @@ export default class GameScene extends Phaser.Scene {
         }
         
         applyListeners(this);
+
+        if (this.myPlayer.host) {
+            deploy();
+        }
 
         // --------------------------------------------    Socket Commands     ---------------------------------------------------------
         
@@ -201,6 +207,10 @@ export default class GameScene extends Phaser.Scene {
                         sprite.setVisible(true);
                     }
                 });
+
+                //start deploy turn
+                deploy();
+
             // else its not my turn
             } else {
                 //disable all sprites
@@ -235,7 +245,6 @@ export default class GameScene extends Phaser.Scene {
     }
 }
 
-//TODO refactor code
 //TODO function that calcs hoy many troops a player has to add on turn, functionality that allows them to add
 //TODO convert from squares to states 
 
@@ -373,4 +382,16 @@ const randomizeTerritories = (scene, socket, mapData, players) => {
     }
 
     socket.emit('setup', newData);
+}
+
+const deploy = () => {
+
+}
+
+const attack = () => {
+
+}
+
+const fortify = () => {
+
 }
