@@ -63,18 +63,3 @@ export function replaceText(sprite, textObject, text) {
     textObject.setText(text);
     textObject.setPosition(sprite.x - textObject.width / 2, sprite.y - textObject.height /2);
 }
-
-// --------------------------------------------    User Prompt    ---------------------------------------------------------
-
-export function limitedPrompt(message, maxLength) {
-    let value = '';
-
-    while (value.length > maxLength || value === '') {
-        value = prompt(message);
-        if (value == null) {
-            return value;
-        }
-    }
-  
-    return value;
-}
