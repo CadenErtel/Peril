@@ -44,7 +44,7 @@ export default class GameScene extends Phaser.Scene {
         this.stage = "deploy";
         this.playerGroups = {};
         
-        const numPlayers = Object.keys(this.scene.settings.data.players).length;
+        this.numPlayers = Object.keys(this.scene.settings.data.players).length;
         
         this.arrows = this.add.group();
         // for each player make a sprite on the side
@@ -54,7 +54,7 @@ export default class GameScene extends Phaser.Scene {
         const height = this.sys.game.config.height;
         const triangleHeight = 40; // set the height of the triangle
         const triangleWidth = 30; // set the width of the triangle base
-        for (let i = 0; i < numPlayers; i++) {
+        for (let i = 0; i < this.numPlayers; i++) {
             const playerIcon = this.add.circle(width - 75, ((i * height) / 10) + 375, 40, colors[i]);
             
             const triangle = this.add.triangle(
@@ -71,7 +71,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.phaseText = this.add.group();
 
-        const bottomBar = this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 190, 500, 90, 10);
+        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 190, 500, 90, 10);
         const deployText = this.add.text(width / 2 - 145, height - 145, "Deploy", {fontSize : "24px"} ).setOrigin(.5);
         const attackText = this.add.text(width / 2, height - 145, "Attack", {fontSize : "24px"}).setOrigin(.5);
         const reinforceText = this.add.text(width / 2 + 150, height - 145, "Fortify", {fontSize : "24px"}).setOrigin(.5);
@@ -90,69 +90,25 @@ export default class GameScene extends Phaser.Scene {
     }
     
     create(data) {
-        
-        const width = this.sys.game.config.width;
-        const height = this.sys.game.config.height;
-        const numPlayers = Object.keys(data.players).length;
         const socket = data.socket;
         
         if (data.fadeIn){
-            // wrap this line inside this if block
             this.cameras.main.fadeIn(500, 0, 0, 0)
         }
-        
-        // inital render, and finding of current player
-        for (let i = 0; i < numPlayers; i++){
-            if (socket.id === data.players[i+1].id){
-                this.myPlayer = data.players[i+1];
-                if (i + 1 === 1){
-                    this.phaseText.getChildren().forEach((sprite, index) => {
-                        if (index < 3){
-                            sprite.setVisible(true);
-                        }
-                    });
-                } else {
-                    this.phaseText.getChildren()[3].setVisible(true);
-                }
-            }
-        }
-        
+
         // --------------------------------------------    Static Objects     --------------------------------------------------
         
-        renderTerritories(this, 4, 6);
-        if (this.myPlayer.host) {
-            randomizeTerritories(this, socket, this.mapData, data.players);
-        }
-
-        socket.on('setupTerritories', (updatedMapData) => {
-
-            console.log(updatedMapData);
-
-            for (let i = 0; i < numPlayers; i++){
-                this.playerGroups[i+1] = this.add.group();
-            }
-
-            for (const key in updatedMapData){
-                const currBox = this.mapData[key].sprite;
-                const updatedBoxData = updatedMapData[key];
-                replaceText(currBox, currBox.textObj, updatedBoxData.troops.toString());
-                colorTransition(this, currBox, currBox.data.color, updatedBoxData.color);
-                currBox.data.troops = updatedBoxData.troops;
-                currBox.data.color = updatedBoxData.color;
-                currBox.data.owner = updatedBoxData.owner;
-                this.playerGroups[updatedBoxData.owner].add(currBox);
-            }
-        });
-
-        // --------------------------------------------    Game Start     ---------------------------------------------------------
-
         const nextBtn = this.add.sprite(1835, 975, 'forward-button-up').setInteractive();
+        const settingsButton = this.add.sprite(75, 75, 'options-button-up').setInteractive();
+
+        // --------------------------------------------    Static Object Logic     --------------------------------------------------
+
         nextBtn.on('pointerdown', () => {
             this.sound.play('button-press-sound');
             // if not in the fortify stage change to next stage, else end turn
-
-            let currText = this.phaseText.getChildren();
-
+            
+            const currText = this.phaseText.getChildren();
+            
             if (this.stage === "deploy"){
                 this.stage = "attack";
                 
@@ -178,63 +134,87 @@ export default class GameScene extends Phaser.Scene {
             
         });
 
-        const settingsButton = this.add.sprite(50, 50, 'options-button-up').setInteractive();
-        settingsButton.setOrigin(0);
+        
         settingsButton.on('pointerdown', () => {
             this.sound.play('button-press-sound');
         });
+        
+        // --------------------------------------------    Game Start     ---------------------------------------------------------
 
-        this.arrows.getChildren()[this.turn-1].setVisible(true);
+        initialLoad(this, data.players, socket);
+        
+        renderTerritories(this, 4, 6);
+        if (this.myPlayer.host) {
+            randomizeTerritories(this, socket, this.mapData, data.players);
+        }
+        
+        applyListeners(this);
+
+        // --------------------------------------------    Socket Commands     ---------------------------------------------------------
+        
+        socket.on('setupTerritories', (updatedMapData) => {
+            
+            console.log(updatedMapData);
+            
+            for (let i = 0; i < this.numPlayers; i++){
+                this.playerGroups[i+1] = this.add.group();
+            }
+            
+            for (const key in updatedMapData){
+                const currBox = this.mapData[key].sprite;
+                const updatedBoxData = updatedMapData[key];
+                replaceText(currBox, currBox.textObj, updatedBoxData.troops.toString());
+                colorTransition(this, currBox, currBox.data.color, updatedBoxData.color);
+                currBox.data.troops = updatedBoxData.troops;
+                currBox.data.color = updatedBoxData.color;
+                currBox.data.owner = updatedBoxData.owner;
+                this.playerGroups[updatedBoxData.owner].add(currBox);
+            }
+        });
+        
 
         socket.on('nextTurn', (turnNum) => {
-            this.stage = "deploy";
-            this.arrows.getChildren()[this.turn-1].setVisible(false);
+            this.stage = "deploy"; //reset stage state
+            this.arrows.getChildren()[this.turn-1].setVisible(false); //hide last players arrow
+
+            //hide phase text every turn
             this.phaseText.getChildren().forEach(sprite => {
                 sprite.setVisible(false);
             })
-            this.turn = turnNum;
-            this.arrows.getChildren()[this.turn-1].setVisible(true);
 
+            this.turn = turnNum;
+            this.arrows.getChildren()[this.turn-1].setVisible(true); //show current player arrow
+
+            //if its the current clients turn
             if (data.players[this.turn].id === this.myPlayer.id) {
                 console.log("ITS MY TURRN!!!!!!");
+
+                //enable the sprites in that clients player group
                 this.playerGroups[this.turn].getChildren().forEach(sprite => {
                     sprite.setInteractive();
                 });
+
+                //show the turn phasing text
                 this.phaseText.getChildren().forEach((sprite, index) => {
                     if (index < 3){
                         sprite.setVisible(true);
                     }
                 });
+            // else its not my turn
             } else {
+                //disable all sprites
                 for (const key in this.playerGroups){
                     this.playerGroups[key].getChildren().forEach(sprite => {
                         sprite.disableInteractive();
                     });
-                    this.phaseText.getChildren()[3].setVisible(true);
                 }
+
+                //show waiting for turn text
+                this.phaseText.getChildren()[3].setVisible(true);
             }
         });
 
-        for (const key in this.mapData){
-            const box = this.mapData[key].sprite;
-            box.on('pointerdown', () => {
-                let num = parseInt(box.textObj.text) + 1; // Access box_value from the property of box
-                replaceText(box, box.textObj, num.toString()); // Access box_value from the property of box
-                colorTransition(this, box, box.data.color, this.myPlayer.color);
-    
-                box.data.troops = num;
-                box.data.color = this.myPlayer.color;
-                box.data.owner = this.myPlayer.id;
-
-                // Send updated data to the server
-                const newData = {};
-                for (const key in this.mapData){
-                    newData[key] = this.mapData[key].sprite.data;
-                }
-
-                socket.emit('update', newData);
-            });
-        }
+        
         
         // --------------------------------------------    Each Turn     --------------------------------------------------
 
@@ -250,6 +230,45 @@ export default class GameScene extends Phaser.Scene {
                 currBox.data.color = updatedBoxData.color;
                 currBox.data.owner = updatedBoxData.owner;
             }
+        });
+    }
+}
+
+//TODO refactor code
+//TODO function that calcs hoy many troops a player has to add on turn, functionality that allows them to add
+//TODO convert from squares to states 
+
+const initialLoad = (scene, playerData, socket) => {
+
+    scene.arrows.getChildren()[0].setVisible(true); //initial arrow
+
+    for (let i = 0; i < scene.numPlayers; i++){
+        if (socket.id === playerData[i+1].id){
+            scene.myPlayer = playerData[i+1];
+            if (i + 1 === 1){
+                scene.phaseText.getChildren().forEach((sprite, index) => {
+                    if (index < 3){
+                        sprite.setVisible(true);
+                    }
+                });
+            } else {
+                scene.phaseText.getChildren()[3].setVisible(true);
+            }
+        }
+    }
+}
+
+const applyListeners = (scene) => {
+    for (const key in scene.mapData){
+        const box = scene.mapData[key].sprite;
+        box.on('pointerdown', () => {
+            let num = parseInt(box.textObj.text) + 1; // Access box_value from the property of box
+            replaceText(box, box.textObj, num.toString()); // Access box_value from the property of box
+            colorTransition(scene, box, box.data.color, scene.myPlayer.color);
+
+            box.data.troops = num;
+            box.data.color = scene.myPlayer.color;
+            box.data.owner = scene.myPlayer.id;
         });
     }
 }
