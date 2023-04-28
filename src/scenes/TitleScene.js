@@ -147,13 +147,13 @@ export default class TitleScene extends Phaser.Scene {
                         if (nickName.isConfirmed) {
                             console.log('Text entered:', nickName.value);
                             socket.emit('joinRoom', roomResult.value.toUpperCase(), nickName.value);
-                        } else if (nickName.dismiss === Swal.DismissReason.cancel) {
+                        } else if (nickName.dismiss === Swal.DismissReason.cancel || nickName.dismiss === Swal.DismissReason.esc) {
                             hostBtn.setInteractive();
                             joinBtn.setInteractive();
                         }
                     });
 
-                } else if (roomResult.dismiss === Swal.DismissReason.cancel) {
+                } else if (roomResult.dismiss === Swal.DismissReason.cancel || roomResult.dismiss === Swal.DismissReason.esc) {
                     hostBtn.setInteractive();
                     joinBtn.setInteractive();
                 }
