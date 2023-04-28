@@ -6,6 +6,7 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
 		super('game');
         this.myPlayer = null;
+        this.troopsToAdd = 0;
         this.mapData = 
         {
             "1": { "sprite" : null, "adjacent" : [] },
@@ -108,30 +109,35 @@ export default class GameScene extends Phaser.Scene {
             this.sound.play('button-press-sound');
             // if not in the fortify stage change to next stage, else end turn
             
-            const currText = this.phaseText.getChildren();
-            
             if (this.stage === "deploy"){
-                this.stage = "attack";
-                
-                currText[0].setTint(0xFFFFFF);
-                currText[1].setTint(0x00FF00);
-                console.log("go to attack");
-                //colorTransition(this, attackText, 0x000000, 0x00FF00);
-                //attackText.setTint(0x00FF00)
+
+                if (this.troopsToAdd > 0) {
+                    disablePlayerSprites(this);
+                    Swal.fire({
+                        title: 'You still have troops to deploy! Are you sure you want to end deployment?',
+                        showDenyButton: true,
+                        confirmButtonText: 'Continue',
+                        denyButtonText: 'Return',
+                        icon : 'warning',
+                        backdrop : false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            setAttackPhase(this);
+                        } 
+                        enablePlayerSprites(this);
+                    })
+                } else {
+                    setAttackPhase(this);
+                }
+
             }
             else if (this.stage === "attack"){
-                this.stage = "fortify";
-                console.log("go to fortify");
-                currText[1].setTint(0xFFFFFF);
-                currText[2].setTint(0x00FF00);
                 attack();
+                setFortifyPhase(this);
             }
             else if (this.stage === "fortify") {
-                this.stage = "deploy";
-                console.log("go to next turn");
-                currText[2].setTint(0xFFFFFF);
-                currText[0].setTint(0x00FF00);
                 fortify();
+                setDeployPhase(this);
                 socket.emit('endTurn');
             }
             
@@ -154,7 +160,8 @@ export default class GameScene extends Phaser.Scene {
         applyListeners(this);
 
         if (this.myPlayer.host) {
-            deploy();
+            console.log("LETS DEPLOY!");
+            deploy(this);
         }
 
         // --------------------------------------------    Socket Commands     ---------------------------------------------------------
@@ -197,10 +204,8 @@ export default class GameScene extends Phaser.Scene {
                 console.log("ITS MY TURRN!!!!!!");
 
                 //enable the sprites in that clients player group
-                this.playerGroups[this.turn].getChildren().forEach(sprite => {
-                    sprite.setInteractive();
-                });
-
+                enablePlayerSprites(this);
+                
                 //show the turn phasing text
                 this.phaseText.getChildren().forEach((sprite, index) => {
                     if (index < 3){
@@ -209,7 +214,7 @@ export default class GameScene extends Phaser.Scene {
                 });
 
                 //start deploy turn
-                deploy();
+                deploy(this);
 
             // else its not my turn
             } else {
@@ -272,13 +277,45 @@ const applyListeners = (scene) => {
     for (const key in scene.mapData){
         const box = scene.mapData[key].sprite;
         box.on('pointerdown', () => {
-            let num = parseInt(box.textObj.text) + 1; // Access box_value from the property of box
-            replaceText(box, box.textObj, num.toString()); // Access box_value from the property of box
-            colorTransition(scene, box, box.data.color, scene.myPlayer.color);
+            
+            //if stage is deploy
+            // have awindow pops up asking how many to add
+            if (scene.stage === 'deploy'){
+                disablePlayerSprites(scene);
+                Swal.fire({
+                    title: 'How many troops would you like to deploy?',
+                    input: 'range',
+                    inputLabel: 'Troops',
+                    backdrop: false,
+                    inputAttributes: {
+                        min: 0,
+                        max: scene.troopsToAdd,
+                        step: 1
+                    },
+                    inputValue: 0
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const troops = Number(result.value);
+                        if (troops !== 0){
+                            console.log(`Deployed ${troops} troops!`);
+                            scene.troopsToAdd -= troops;
+                            box.data.troops += troops;
+                            replaceText(box, box.textObj, box.data.troops.toString());
+                        }
 
-            box.data.troops = num;
-            box.data.color = scene.myPlayer.color;
-            box.data.owner = scene.myPlayer.id;
+                        if (scene.troopsToAdd === 0){
+                            setAttackPhase(scene);
+                        } 
+                    }
+                    enablePlayerSprites(scene);
+                });
+                
+            } else if (scene.stage === "attack"){
+                colorTransition(scene, box, box.data.color, scene.myPlayer.color);
+                box.data.color = scene.myPlayer.color;
+                box.data.owner = scene.myPlayer.id;
+            }
+            
         });
     }
 }
@@ -384,8 +421,62 @@ const randomizeTerritories = (scene, socket, mapData, players) => {
     socket.emit('setup', newData);
 }
 
-const deploy = () => {
+const deploy = (scene) => {
 
+    const troopsForTurn = getTroopsforTurn(scene);
+    scene.troopsToAdd = troopsForTurn;
+
+    disablePlayerSprites(scene);
+    Swal.fire({
+        title: 'Deployment Phase!',
+        text: `You have ${troopsForTurn} troops to deploy!`,
+        backdrop: false,
+        timer : 4000,
+        timerProgressBar : true
+    }).then(() => {
+        enablePlayerSprites(scene);
+    });
+
+}
+
+const getTroopsforTurn = (scene) => {
+
+    const numTerritories = Object.keys(scene.mapData).length;
+    const baseCount = Math.floor(numTerritories / (2 * scene.numPlayers));
+    let bonus = 0;
+
+    const myTerritoriesCount = scene.playerGroups[scene.turn].getChildren().length;
+    if (myTerritoriesCount > (numTerritories / scene.numPlayers)){
+        const diff = myTerritoriesCount - (numTerritories / scene.numPlayers);
+        bonus += Math.floor(diff / 2);
+    }
+
+    return baseCount + bonus;
+}
+
+const setAttackPhase = (scene) => {
+    const currText = scene.phaseText.getChildren();
+    scene.troopsToAdd = 0;
+    scene.stage = "attack";
+    currText[0].setTint(0xFFFFFF);
+    currText[1].setTint(0x00FF00);
+    console.log("go to attack");
+}
+
+const setDeployPhase = (scene) => {
+    const currText = scene.phaseText.getChildren();
+    scene.stage = "deploy";
+    console.log("go to next turn");
+    currText[2].setTint(0xFFFFFF);
+    currText[0].setTint(0x00FF00);
+}
+
+const setFortifyPhase = (scene) => {
+    const currText = scene.phaseText.getChildren();
+    scene.stage = "fortify";
+    currText[1].setTint(0xFFFFFF);
+    currText[2].setTint(0x00FF00);
+    console.log("go to fortify");
 }
 
 const attack = () => {
@@ -394,4 +485,16 @@ const attack = () => {
 
 const fortify = () => {
 
+}
+
+const disablePlayerSprites = (scene) => {
+    scene.playerGroups[scene.turn].getChildren().forEach(sprite => {
+        sprite.disableInteractive();
+    });
+}
+
+const enablePlayerSprites = (scene) => {
+    scene.playerGroups[scene.turn].getChildren().forEach(sprite => {
+        sprite.setInteractive();
+    });
 }
