@@ -15,7 +15,6 @@ export default class TitleScene extends Phaser.Scene {
         this.load.atlas('title-atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
 
-        this.load.json('countries', 'assets/countries.json');
         this.load.json('states', 'assets/states.json');
 
         this.load.image('cali', "assets/california.png");
@@ -50,7 +49,7 @@ export default class TitleScene extends Phaser.Scene {
         image.displayWidth = width;
         image.displayHeight = height;
 
-        const cali = this.cache.json.get('states').California
+        const cali = this.cache.json.get('states').california
         const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
         const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
         cali_img.setExistingBody(cali_body);
