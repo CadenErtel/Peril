@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import Swal from 'sweetalert2';
 import { addText, colorTransition, replaceText, shakeScreen } from '../common';
 
 export default class GameScene extends Phaser.Scene {
@@ -71,11 +72,11 @@ export default class GameScene extends Phaser.Scene {
 
         this.phaseText = this.add.group();
 
-        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 190, 500, 90, 10);
-        const deployText = this.add.text(width / 2 - 145, height - 145, "Deploy", {fontSize : "24px"} ).setOrigin(.5);
-        const attackText = this.add.text(width / 2, height - 145, "Attack", {fontSize : "24px"}).setOrigin(.5);
-        const reinforceText = this.add.text(width / 2 + 150, height - 145, "Fortify", {fontSize : "24px"}).setOrigin(.5);
-        const waitTurnText = this.add.text(width / 2, height - 145, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
+        this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 145, 500, 90, 10);
+        const deployText = this.add.text(width / 2 - 145, height - 100, "Deploy", {fontSize : "24px"} ).setOrigin(.5);
+        const attackText = this.add.text(width / 2, height - 100, "Attack", {fontSize : "24px"}).setOrigin(.5);
+        const reinforceText = this.add.text(width / 2 + 150, height - 100, "Fortify", {fontSize : "24px"}).setOrigin(.5);
+        const waitTurnText = this.add.text(width / 2, height - 100, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
 
         deployText.setTint(0x00FF00);
 
