@@ -1,0 +1,775 @@
+{
+	"textures": [
+		{
+			"image": "stateIcons",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2249,
+				"h": 2246
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "texas",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 672,
+						"h": 654
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 672,
+						"h": 654
+					},
+					"frame": {
+						"x": 10,
+						"y": 10,
+						"w": 672,
+						"h": 654
+					}
+				},
+				{
+					"filename": "california",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 381,
+						"h": 657
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 381,
+						"h": 657
+					},
+					"frame": {
+						"x": 10,
+						"y": 684,
+						"w": 381,
+						"h": 657
+					}
+				},
+				{
+					"filename": "nevada",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 342,
+						"h": 501
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 342,
+						"h": 501
+					},
+					"frame": {
+						"x": 10,
+						"y": 1361,
+						"w": 342,
+						"h": 501
+					}
+				},
+				{
+					"filename": "newmexico",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 339,
+						"h": 354
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 339,
+						"h": 354
+					},
+					"frame": {
+						"x": 10,
+						"y": 1882,
+						"w": 339,
+						"h": 354
+					}
+				},
+				{
+					"filename": "minnesota",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 314,
+						"h": 343
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 314,
+						"h": 343
+					},
+					"frame": {
+						"x": 369,
+						"y": 1882,
+						"w": 314,
+						"h": 343
+					}
+				},
+				{
+					"filename": "pnw",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 414,
+						"h": 476
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 414,
+						"h": 476
+					},
+					"frame": {
+						"x": 372,
+						"y": 1361,
+						"w": 414,
+						"h": 476
+					}
+				},
+				{
+					"filename": "northeast",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 326,
+						"h": 376
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 326,
+						"h": 376
+					},
+					"frame": {
+						"x": 703,
+						"y": 1857,
+						"w": 326,
+						"h": 376
+					}
+				},
+				{
+					"filename": "idaho",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 289,
+						"h": 462
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 289,
+						"h": 462
+					},
+					"frame": {
+						"x": 806,
+						"y": 1361,
+						"w": 289,
+						"h": 462
+					}
+				},
+				{
+					"filename": "utah",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 284,
+						"h": 361
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 284,
+						"h": 361
+					},
+					"frame": {
+						"x": 1049,
+						"y": 1843,
+						"w": 284,
+						"h": 361
+					}
+				},
+				{
+					"filename": "new_england",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 274,
+						"h": 428
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 274,
+						"h": 428
+					},
+					"frame": {
+						"x": 411,
+						"y": 684,
+						"w": 274,
+						"h": 428
+					}
+				},
+				{
+					"filename": "kansas",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 353,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 353,
+						"h": 200
+					},
+					"frame": {
+						"x": 411,
+						"y": 1132,
+						"w": 353,
+						"h": 200
+					}
+				},
+				{
+					"filename": "dakotas",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 357,
+						"h": 421
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 357,
+						"h": 421
+					},
+					"frame": {
+						"x": 702,
+						"y": 10,
+						"w": 357,
+						"h": 421
+					}
+				},
+				{
+					"filename": "oklahoma",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 413,
+						"h": 211
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 413,
+						"h": 211
+					},
+					"frame": {
+						"x": 702,
+						"y": 451,
+						"w": 413,
+						"h": 211
+					}
+				},
+				{
+					"filename": "arizona",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 338,
+						"h": 398
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 338,
+						"h": 398
+					},
+					"frame": {
+						"x": 1079,
+						"y": 10,
+						"w": 338,
+						"h": 398
+					}
+				},
+				{
+					"filename": "montana",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 478,
+						"h": 332
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 478,
+						"h": 332
+					},
+					"frame": {
+						"x": 705,
+						"y": 682,
+						"w": 478,
+						"h": 332
+					}
+				},
+				{
+					"filename": "colorado",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 350,
+						"h": 301
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 350,
+						"h": 301
+					},
+					"frame": {
+						"x": 784,
+						"y": 1034,
+						"w": 350,
+						"h": 301
+					}
+				},
+				{
+					"filename": "arkansas",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 234,
+						"h": 222
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 234,
+						"h": 222
+					},
+					"frame": {
+						"x": 1135,
+						"y": 428,
+						"w": 234,
+						"h": 222
+					}
+				},
+				{
+					"filename": "illinois",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 194,
+						"h": 327
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 194,
+						"h": 327
+					},
+					"frame": {
+						"x": 1115,
+						"y": 1355,
+						"w": 194,
+						"h": 327
+					}
+				},
+				{
+					"filename": "alabama",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 194,
+						"h": 295
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 194,
+						"h": 295
+					},
+					"frame": {
+						"x": 1154,
+						"y": 1034,
+						"w": 194,
+						"h": 295
+					}
+				},
+				{
+					"filename": "wisconsin",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 386,
+						"h": 320
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 386,
+						"h": 320
+					},
+					"frame": {
+						"x": 1203,
+						"y": 670,
+						"w": 386,
+						"h": 320
+					}
+				},
+				{
+					"filename": "ohio",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 200,
+						"h": 218
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 200,
+						"h": 218
+					},
+					"frame": {
+						"x": 1389,
+						"y": 428,
+						"w": 200,
+						"h": 218
+					}
+				},
+				{
+					"filename": "florida",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 438,
+						"h": 319
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 438,
+						"h": 319
+					},
+					"frame": {
+						"x": 1437,
+						"y": 10,
+						"w": 438,
+						"h": 319
+					}
+				},
+				{
+					"filename": "kentucky",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 326,
+						"h": 189
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 326,
+						"h": 189
+					},
+					"frame": {
+						"x": 1895,
+						"y": 10,
+						"w": 326,
+						"h": 189
+					}
+				},
+				{
+					"filename": "iowa",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 290,
+						"h": 189
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 290,
+						"h": 189
+					},
+					"frame": {
+						"x": 1895,
+						"y": 219,
+						"w": 290,
+						"h": 189
+					}
+				},
+				{
+					"filename": "maryland_delaware",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 224,
+						"h": 161
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 224,
+						"h": 161
+					},
+					"frame": {
+						"x": 1609,
+						"y": 349,
+						"w": 224,
+						"h": 161
+					}
+				},
+				{
+					"filename": "tennessee",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 386,
+						"h": 141
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 386,
+						"h": 141
+					},
+					"frame": {
+						"x": 1853,
+						"y": 428,
+						"w": 386,
+						"h": 141
+					}
+				},
+				{
+					"filename": "missisippi",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 160,
+						"h": 288
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 160,
+						"h": 288
+					},
+					"frame": {
+						"x": 1609,
+						"y": 530,
+						"w": 160,
+						"h": 288
+					}
+				},
+				{
+					"filename": "carolinas",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 427,
+						"h": 309
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 427,
+						"h": 309
+					},
+					"frame": {
+						"x": 1789,
+						"y": 589,
+						"w": 427,
+						"h": 309
+					}
+				},
+				{
+					"filename": "indiana",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 149,
+						"h": 253
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 149,
+						"h": 253
+					},
+					"frame": {
+						"x": 1609,
+						"y": 838,
+						"w": 149,
+						"h": 253
+					}
+				},
+				{
+					"filename": "missouri",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 409,
+						"h": 292
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 409,
+						"h": 292
+					},
+					"frame": {
+						"x": 1778,
+						"y": 1010,
+						"w": 409,
+						"h": 292
+					}
+				},
+				{
+					"filename": "virginias",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 365,
+						"h": 267
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 365,
+						"h": 267
+					},
+					"frame": {
+						"x": 1368,
+						"y": 1111,
+						"w": 365,
+						"h": 267
+					}
+				},
+				{
+					"filename": "michigan",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 409,
+						"h": 252
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 409,
+						"h": 252
+					},
+					"frame": {
+						"x": 1753,
+						"y": 1322,
+						"w": 409,
+						"h": 252
+					}
+				},
+				{
+					"filename": "nebraska",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 409,
+						"h": 210
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 409,
+						"h": 210
+					},
+					"frame": {
+						"x": 1329,
+						"y": 1594,
+						"w": 409,
+						"h": 210
+					}
+				},
+				{
+					"filename": "wyoming",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 348,
+						"h": 279
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 348,
+						"h": 279
+					},
+					"frame": {
+						"x": 1758,
+						"y": 1594,
+						"w": 348,
+						"h": 279
+					}
+				},
+				{
+					"filename": "georgia",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 267,
+						"h": 272
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 267,
+						"h": 272
+					},
+					"frame": {
+						"x": 1758,
+						"y": 1893,
+						"w": 267,
+						"h": 272
+					}
+				},
+				{
+					"filename": "louisiana",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 278,
+						"h": 242
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 278,
+						"h": 242
+					},
+					"frame": {
+						"x": 1353,
+						"y": 1824,
+						"w": 278,
+						"h": 242
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "http://free-tex-packer.com",
+		"version": "0.6.7"
+	}
+}

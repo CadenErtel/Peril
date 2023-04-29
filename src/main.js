@@ -7,16 +7,17 @@ const config = {
 	type: Phaser.AUTO,
     width : 1920,
     height : 1080,
+    backgroundColor : 0x00EEFA,
     resolution: window.devicePixelRatio || 1,
     physics: {
         default: 'matter',
         matter: {
             gravity : {x:0,y:0},
-            debug: {
-                staticLineColor : 0xff0000,
-                staticFillColor: 0xff0000,
-                renderFill : true
-            }
+            // debug: {
+            //     staticLineColor : 0xff0000,
+            //     staticFillColor: 0xff0000,
+            //     renderFill : true
+            // }
         }
     },
 	scale: {

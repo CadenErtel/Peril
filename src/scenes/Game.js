@@ -7,33 +7,7 @@ export default class GameScene extends Phaser.Scene {
 		super('game');
         this.myPlayer = null;
         this.troopsToAdd = 0;
-        this.mapData = 
-        {
-            "1": { "sprite" : null, "adjacent" : [] },
-            "2": { "sprite" : null, "adjacent" : [] },
-            "3": { "sprite" : null, "adjacent" : [] },
-            "4": { "sprite" : null, "adjacent" : [] },
-            "5": { "sprite" : null, "adjacent" : [] },
-            "6": { "sprite" : null, "adjacent" : [] },
-            "7": { "sprite" : null, "adjacent" : [] },
-            "8": { "sprite" : null, "adjacent" : [] },
-            "9": { "sprite" : null, "adjacent" : [] },
-            "10": { "sprite" : null, "adjacent" : [] },
-            "11": { "sprite" : null, "adjacent" : [] },
-            "12": { "sprite" : null, "adjacent" : [] },
-            "13": { "sprite" : null, "adjacent" : [] },
-            "14": { "sprite" : null, "adjacent" : [] },
-            "15": { "sprite" : null, "adjacent" : [] },
-            "16": { "sprite" : null, "adjacent" : [] },
-            "17": { "sprite" : null, "adjacent" : [] },
-            "18": { "sprite" : null, "adjacent" : [] },
-            "19": { "sprite" : null, "adjacent" : [] },
-            "20": { "sprite" : null, "adjacent" : [] },
-            "21": { "sprite" : null, "adjacent" : [] },
-            "22": { "sprite" : null, "adjacent" : [] },
-            "23": { "sprite" : null, "adjacent" : [] },
-            "24": { "sprite" : null, "adjacent" : [] }
-        }
+        this.mapData = {};
 	}
     
     preload () {
@@ -41,7 +15,11 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('forward-button-down', 'assets/images/forward-button-down.png');
         this.load.image('options-button-up', 'assets/images/options-button-up.png');
         this.load.image('options-button-down', 'assets/images/options-button-down.png');
-        
+
+        this.load.atlas('state-atlas', 'assets/states/stateIcons.png', 'assets/states/stateIcons.json');
+        this.load.json('state-bodies', 'assets/states/states.json');
+        this.load.json('state-data', 'assets/states/stateData.json');
+
         this.turn = 1;
         this.stage = "deploy";
         this.playerGroups = {};
@@ -152,17 +130,17 @@ export default class GameScene extends Phaser.Scene {
 
         initialLoad(this, data.players, socket);
         
-        renderTerritories(this, 4, 6);
-        if (this.myPlayer.host) {
-            randomizeTerritories(this, socket, this.mapData, data.players);
-        }
+        renderTerritories(this);
+        // if (this.myPlayer.host) {
+        //     randomizeTerritories(this, socket, this.mapData, data.players);
+        // }
         
-        applyListeners(this);
+        // applyListeners(this);
 
-        if (this.myPlayer.host) {
-            console.log("LETS DEPLOY!");
-            deploy(this);
-        }
+        // if (this.myPlayer.host) {
+        //     console.log("LETS DEPLOY!");
+        //     deploy(this);
+        // }
 
         // --------------------------------------------    Socket Commands     ---------------------------------------------------------
         
@@ -230,7 +208,14 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
-        
+        this.input.on('pointerdown', (pointer) => {
+            const clickedBody = this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position);
+            if (clickedBody) {
+                clickedBody.forEach(body => {
+                    console.log(body.label);
+                });
+            }	            
+        });
         
         // --------------------------------------------    Each Turn     --------------------------------------------------
 
@@ -320,37 +305,45 @@ const applyListeners = (scene) => {
     }
 }
 
-const renderTerritories = (scene, rows, cols) => {
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            
-            const box = scene.add.sprite((j * scene.sys.game.config.width / 7) + 274, (i * scene.sys.game.config.height / 5) + 120, 'menu-box').disableInteractive();
-            const box_value = addText(scene, box, 1, '28px', '#0f0');
-            
-            box.scale = 0.25;
-            box.data = {};
-            box.data.id =  (i * cols + j) + 1;
-            box.data.owner = null;
-            box.data.color = 0xffffff;
-            box.data.troops = 1;
-            box.textObj = box_value; // Store box_value as a property of box
-            
-            scene.mapData[box.data.id].sprite = box;
+const renderTerritories = (scene) => {
 
-            if (j > 0){ // left
-                scene.mapData[box.data.id - 1].adjacent.push(box);
-            }
-            if (j < cols - 1){ // right
-                scene.mapData[box.data.id + 1].adjacent.push(box);
-            }
-            if (i > 0){ // above
-                scene.mapData[box.data.id - cols].adjacent.push(box);
-            }
-            if (i < rows - 1){ //below
-                scene.mapData[box.data.id + cols].adjacent.push(box);
-            }
+    const stateData = scene.cache.json.get('state-data');
+    const stateBodies = scene.cache.json.get('state-bodies');
 
+    for (const key in stateData) {
+
+        const x = stateData[key][0];
+        const y = stateData[key][1];
+
+        const state = scene.matter.add.sprite(x, y, 'state-atlas', key);
+        
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (stateData[key][4]){
+            offsetX = stateData[key][4][0];
+            offsetY = stateData[key][4][1];
         }
+
+        const state_body = scene.matter.add.fromPhysicsEditor(x + 140 + offsetX, y - 220 + offsetY, stateBodies[key]);
+        state.setExistingBody(state_body);
+        state.setScale(stateData[key][2]);
+        
+        const text_value = addText(scene, state, 999, '28px', '#0f0');
+        
+        state.data = {};
+        state.data.id = key;
+        state.data.owner = null;
+        state.data.color = 0xffffff;
+        state.data.troops = 999;
+        state.textObj = text_value; 
+
+        scene.mapData[key] = 
+        {
+            sprite : state,
+            adjacent : stateData[key][3]
+        }
+        
     }
 }
 
