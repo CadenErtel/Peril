@@ -7,7 +7,6 @@ const config = {
 	type: Phaser.AUTO,
     width : 1920,
     height : 1080,
-    backgroundColor : 0x00EEFA,
     resolution: window.devicePixelRatio || 1,
     physics: {
         default: 'matter',

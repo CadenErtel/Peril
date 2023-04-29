@@ -15,11 +15,11 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('forward-button-down', 'assets/images/forward-button-down.png');
         this.load.image('options-button-up', 'assets/images/options-button-up.png');
         this.load.image('options-button-down', 'assets/images/options-button-down.png');
-
+        
         this.load.atlas('state-atlas', 'assets/states/stateIcons.png', 'assets/states/stateIcons.json');
         this.load.json('state-bodies', 'assets/states/states.json');
         this.load.json('state-data', 'assets/states/stateData.json');
-
+        
         this.turn = 1;
         this.stage = "deploy";
         this.playerGroups = {};
@@ -50,15 +50,15 @@ export default class GameScene extends Phaser.Scene {
         }
 
         this.phaseText = this.add.group();
-
+        
         this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 145, 500, 90, 10);
         const deployText = this.add.text(width / 2 - 145, height - 100, "Deploy", {fontSize : "24px"} ).setOrigin(.5);
         const attackText = this.add.text(width / 2, height - 100, "Attack", {fontSize : "24px"}).setOrigin(.5);
         const reinforceText = this.add.text(width / 2 + 150, height - 100, "Fortify", {fontSize : "24px"}).setOrigin(.5);
         const waitTurnText = this.add.text(width / 2, height - 100, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
-
+        
         deployText.setTint(0x00FF00);
-
+        
         this.phaseText.add(deployText);
         this.phaseText.add(attackText);
         this.phaseText.add(reinforceText);
@@ -74,6 +74,7 @@ export default class GameScene extends Phaser.Scene {
         
         if (data.fadeIn){
             this.cameras.main.fadeIn(500, 0, 0, 0)
+            this.cameras.main.setBackgroundColor('#00EEFA');
         }
 
         // --------------------------------------------    Static Objects     --------------------------------------------------
