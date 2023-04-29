@@ -131,6 +131,7 @@ export default class GameScene extends Phaser.Scene {
         initialLoad(this, data.players, socket);
         
         renderTerritories(this);
+        console.log(this.mapData);
         // if (this.myPlayer.host) {
         //     randomizeTerritories(this, socket, this.mapData, data.players);
         // }
@@ -235,7 +236,6 @@ export default class GameScene extends Phaser.Scene {
     }
 }
 
-//TODO function that calcs hoy many troops a player has to add on turn, functionality that allows them to add
 //TODO convert from squares to states 
 
 const initialLoad = (scene, playerData, socket) => {
@@ -330,6 +330,14 @@ const renderTerritories = (scene) => {
         state.setScale(stateData[key][2]);
         
         const text_value = addText(scene, state, 999, '28px', '#0f0');
+        if (stateData[key][5]){
+            let textOffsetX = stateData[key][5][0];
+            let textOffsetY = stateData[key][5][1];
+            text_value.x = text_value.x + textOffsetX;
+            text_value.y = text_value.y + textOffsetY; 
+            text_value.offsetX = textOffsetX;
+            text_value.offsetY = textOffsetY;
+        }
         
         state.data = {};
         state.data.id = key;
@@ -344,6 +352,12 @@ const renderTerritories = (scene) => {
             adjacent : stateData[key][3]
         }
         
+    }
+
+    for (const key in scene.mapData){
+        scene.mapData[key].adjacent.forEach((state, index) => {
+            scene.mapData[key].adjacent[index] = scene.mapData[state].sprite;
+        });
     }
 }
 

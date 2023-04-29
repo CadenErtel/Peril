@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Swal from 'sweetalert2';
 import {io} from "socket.io-client";
-import { fadeOut, buttonPress } from '../common';
+import { fadeOut, buttonPress, addText, replaceText } from '../common';
 
 export default class TitleScene extends Phaser.Scene {
     constructor() {
@@ -139,9 +139,9 @@ export default class TitleScene extends Phaser.Scene {
                     joinBtn.setInteractive();
                 }
             })
-
            
         });
+
 
         socket.on('roomCreated', (players) => {
             console.log(`Room created with code ${players[1].roomCode}`);
