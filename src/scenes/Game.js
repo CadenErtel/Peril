@@ -30,7 +30,11 @@ export default class GameScene extends Phaser.Scene {
         this.arrows = this.add.group();
         // for each player make a sprite on the side
         // make an arrow that can move to each sprite
-        const colors = [0xad1a18, 0x051f75, 0xe9f032, 0x18871c];
+        let colors = [];
+        for (const player in this.players){
+            colors.push(this.players[player].color);
+        }
+        
         const width = this.sys.game.config.width;
         const height = this.sys.game.config.height;
         const triangleHeight = 40; // set the height of the triangle
