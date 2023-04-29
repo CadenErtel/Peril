@@ -157,16 +157,16 @@ module.exports = function(io) {
         
         switch (playerNum) {
             case 1:
-                return 0xff0000;
+                return 0xad1a18;
                 break;
             case 2:
-                return 0x0000ff;
+                return 0x051f75;
                 break;
             case 3:
-                return 0xffff00;
+                return 0xe9f032;
                 break;
             case 4:    
-                return 0x00ff00;
+                return 0x18871c;
                 break;
             default:
                 return 0x808080;

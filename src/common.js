@@ -59,7 +59,10 @@ export function addText (scene, sprite, text, size, color) {
     return word;
 }
 
-export function replaceText(sprite, textObject, text) {
+export function replaceText(sprite) {
+    const textObject = sprite.textObj;
+    const text = sprite.data.troops.toString();
+
     textObject.setText(text);
 
     const offsetX = textObject.offsetX ? textObject.offsetX : 0
