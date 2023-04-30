@@ -61,6 +61,11 @@ module.exports = function(io) {
             socket.to(roomCode).emit('setupTerritories', clientData);
         });
 
+        socket.on("update", (updateData) => {
+            const roomCode = socket.data.roomCode;
+            socket.to(roomCode).emit('serverUpdate', updateData);
+        });
+
         socket.on('endTurn', () => {
             const roomCode = socket.data.roomCode;
             rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;

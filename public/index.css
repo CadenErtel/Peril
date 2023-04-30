@@ -10,14 +10,7 @@ body {
     src: url('/assets/fonts/Blazma-Regular.woff2');
 }
 
-#join-game-field {
-    font-family: 'Blazma', sans-serif;
-    font-size: 62px; 
-    width: 400px; 
-    height: 50px; 
-    border-radius: 25px; 
-    padding: 10px; 
-    text-align: center; 
-    background-color: #FFFFFF;
-    translate: -30% -40%;
+.fortify {
+    /* width: 20vw;
+    height: 20vh; */
 }
