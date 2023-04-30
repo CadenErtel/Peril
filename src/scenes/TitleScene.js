@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Swal from 'sweetalert2';
 import {io} from "socket.io-client";
-import { fadeOut, buttonPress, addText, replaceText } from '../common';
+import { fadeOut, buttonPress } from '../common';
 
 export default class TitleScene extends Phaser.Scene {
     constructor() {
