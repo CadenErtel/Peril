@@ -377,7 +377,7 @@ const applyListeners = (scene, socket) => {
                                 timerProgressBar : true
                             }).then(() => {
                                 enableInput(scene);
-                                fortifyPopUp(scene, territory.gameObject.data.name);
+                                fortifyPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
                             });
                         }
 
