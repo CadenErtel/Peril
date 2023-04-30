@@ -90,7 +90,6 @@ export default class TitleScene extends Phaser.Scene {
 
             hostBtn.disableInteractive();
             joinBtn.disableInteractive();
-            
 
             Swal.fire({
                 backdrop: false,
@@ -127,14 +126,16 @@ export default class TitleScene extends Phaser.Scene {
                     }).then((nickName) => {
                         if (nickName.isConfirmed) {
                             console.log('Text entered:', nickName.value);
+                            hostBtn.setInteractive();
+                            joinBtn.setInteractive();
                             socket.emit('joinRoom', roomResult.value.toUpperCase(), nickName.value);
-                        } else if (nickName.dismiss === Swal.DismissReason.cancel || nickName.dismiss === Swal.DismissReason.esc) {
+                        } else {
                             hostBtn.setInteractive();
                             joinBtn.setInteractive();
                         }
                     });
 
-                } else if (roomResult.dismiss === Swal.DismissReason.cancel || roomResult.dismiss === Swal.DismissReason.esc) {
+                } else {
                     hostBtn.setInteractive();
                     joinBtn.setInteractive();
                 }
@@ -155,8 +156,7 @@ export default class TitleScene extends Phaser.Scene {
         
         socket.on('error', (message) => {
             Swal.fire({
-                title: 'Balls?!',
-                text: message,
+                title: message,
                 icon: 'error',
                 backdrop : false
             })
