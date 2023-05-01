@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Swal from 'sweetalert2';
 import {io} from "socket.io-client";
-import { fadeOut, buttonPress, limitedPrompt } from '../common';
+import { fadeOut, buttonPress } from '../common';
 
 export default class TitleScene extends Phaser.Scene {
     constructor() {
@@ -14,12 +14,6 @@ export default class TitleScene extends Phaser.Scene {
         
         this.load.atlas('title-atlas', 'assets/atlas/title/buttons.png', 'assets/atlas/title/buttons.json');
         this.load.audio('button-press-sound', 'assets/audio/button-press.mp3');
-
-        this.load.json('countries', 'assets/countries.json');
-        this.load.json('states', 'assets/states.json');
-
-        this.load.image('cali', "assets/california.png");
-        this.load.image('idaho', "assets/idaho.png");
     }
     
     create(data) {
@@ -49,30 +43,6 @@ export default class TitleScene extends Phaser.Scene {
         const image = this.add.image(0, 0, 'background').setOrigin(0,0);
         image.displayWidth = width;
         image.displayHeight = height;
-
-        const cali = this.cache.json.get('states').California
-        const cali_img = this.matter.add.sprite(width / 2 + 500, height / 6, 'cali');
-        const cali_body =  this.matter.add.fromPhysicsEditor(width/2+500, height/6, cali);
-        cali_img.setExistingBody(cali_body);
-        cali_img.setScale(.5);
-
-        const idaho = this.cache.json.get('states').idaho
-        const id_img = this.matter.add.sprite(1510, 100, 'idaho');
-        const id_body =  this.matter.add.fromPhysicsEditor(1510, 100, idaho);
-        id_img.setExistingBody(id_body);
-        id_img.setScale(.3);
-        id_img.setTint(0x00FF00);
-
-        this.input.on('pointerdown', (pointer) => {
-            const clickedBody = this.matter.query.point(this.matter.world.localWorld.bodies, pointer.position);
-            if (clickedBody) {
-                clickedBody.forEach(body => {
-                    console.log(body);
-                    console.log(body.label);
-                });
-            }	            
-        });
-
 
         this.add.image(width / 2, height / 6, 'title').setOrigin(.5).setScale(1.5);
 
@@ -120,7 +90,6 @@ export default class TitleScene extends Phaser.Scene {
 
             hostBtn.disableInteractive();
             joinBtn.disableInteractive();
-            
 
             Swal.fire({
                 backdrop: false,
@@ -157,21 +126,23 @@ export default class TitleScene extends Phaser.Scene {
                     }).then((nickName) => {
                         if (nickName.isConfirmed) {
                             console.log('Text entered:', nickName.value);
+                            hostBtn.setInteractive();
+                            joinBtn.setInteractive();
                             socket.emit('joinRoom', roomResult.value.toUpperCase(), nickName.value);
-                        } else if (nickName.dismiss === Swal.DismissReason.cancel || nickName.dismiss === Swal.DismissReason.esc) {
+                        } else {
                             hostBtn.setInteractive();
                             joinBtn.setInteractive();
                         }
                     });
 
-                } else if (roomResult.dismiss === Swal.DismissReason.cancel || roomResult.dismiss === Swal.DismissReason.esc) {
+                } else {
                     hostBtn.setInteractive();
                     joinBtn.setInteractive();
                 }
             })
-
            
         });
+
 
         socket.on('roomCreated', (players) => {
             console.log(`Room created with code ${players[1].roomCode}`);
@@ -185,8 +156,7 @@ export default class TitleScene extends Phaser.Scene {
         
         socket.on('error', (message) => {
             Swal.fire({
-                title: 'Balls?!',
-                text: message,
+                title: message,
                 icon: 'error',
                 backdrop : false
             })

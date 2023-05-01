@@ -12,11 +12,11 @@ const config = {
         default: 'matter',
         matter: {
             gravity : {x:0,y:0},
-            debug: {
-                staticLineColor : 0xff0000,
-                staticFillColor: 0xff0000,
-                renderFill : true
-            }
+            // debug: {
+            //     staticLineColor : 0xff0000,
+            //     staticFillColor: 0xff0000,
+            //     renderFill : true
+            // }
         }
     },
 	scale: {

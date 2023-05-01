@@ -6,34 +6,12 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
 		super('game');
         this.myPlayer = null;
+        this.inputEnabled = true;
+        this.clickedTerritory = null;
         this.troopsToAdd = 0;
-        this.mapData = 
-        {
-            "1": { "sprite" : null, "adjacent" : [] },
-            "2": { "sprite" : null, "adjacent" : [] },
-            "3": { "sprite" : null, "adjacent" : [] },
-            "4": { "sprite" : null, "adjacent" : [] },
-            "5": { "sprite" : null, "adjacent" : [] },
-            "6": { "sprite" : null, "adjacent" : [] },
-            "7": { "sprite" : null, "adjacent" : [] },
-            "8": { "sprite" : null, "adjacent" : [] },
-            "9": { "sprite" : null, "adjacent" : [] },
-            "10": { "sprite" : null, "adjacent" : [] },
-            "11": { "sprite" : null, "adjacent" : [] },
-            "12": { "sprite" : null, "adjacent" : [] },
-            "13": { "sprite" : null, "adjacent" : [] },
-            "14": { "sprite" : null, "adjacent" : [] },
-            "15": { "sprite" : null, "adjacent" : [] },
-            "16": { "sprite" : null, "adjacent" : [] },
-            "17": { "sprite" : null, "adjacent" : [] },
-            "18": { "sprite" : null, "adjacent" : [] },
-            "19": { "sprite" : null, "adjacent" : [] },
-            "20": { "sprite" : null, "adjacent" : [] },
-            "21": { "sprite" : null, "adjacent" : [] },
-            "22": { "sprite" : null, "adjacent" : [] },
-            "23": { "sprite" : null, "adjacent" : [] },
-            "24": { "sprite" : null, "adjacent" : [] }
-        }
+        this.movedTroops = false;
+        this.attacked = false;
+        this.mapData = {};
 	}
     
     preload () {
@@ -42,16 +20,25 @@ export default class GameScene extends Phaser.Scene {
         this.load.image('options-button-up', 'assets/images/options-button-up.png');
         this.load.image('options-button-down', 'assets/images/options-button-down.png');
         
+        this.load.atlas('state-atlas', 'assets/states/stateIcons.png', 'assets/states/stateIcons.json');
+        this.load.json('state-bodies', 'assets/states/states.json');
+        this.load.json('state-data', 'assets/states/stateData.json');
+        
         this.turn = 1;
         this.stage = "deploy";
         this.playerGroups = {};
         
+        this.players = this.scene.settings.data.players;
         this.numPlayers = Object.keys(this.scene.settings.data.players).length;
         
         this.arrows = this.add.group();
         // for each player make a sprite on the side
         // make an arrow that can move to each sprite
-        const colors = [0xFF0000, 0x0000FF, 0xFFFF00, 0x00FF00];
+        let colors = [];
+        for (const player in this.players){
+            colors.push(this.players[player].color);
+        }
+        
         const width = this.sys.game.config.width;
         const height = this.sys.game.config.height;
         const triangleHeight = 40; // set the height of the triangle
@@ -72,15 +59,15 @@ export default class GameScene extends Phaser.Scene {
         }
 
         this.phaseText = this.add.group();
-
+        
         this.add.graphics().fillStyle(0x606266, .7).fillRoundedRect((width / 2) - 250, height - 145, 500, 90, 10);
         const deployText = this.add.text(width / 2 - 145, height - 100, "Deploy", {fontSize : "24px"} ).setOrigin(.5);
         const attackText = this.add.text(width / 2, height - 100, "Attack", {fontSize : "24px"}).setOrigin(.5);
         const reinforceText = this.add.text(width / 2 + 150, height - 100, "Fortify", {fontSize : "24px"}).setOrigin(.5);
         const waitTurnText = this.add.text(width / 2, height - 100, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
-
+        
         deployText.setTint(0x00FF00);
-
+        
         this.phaseText.add(deployText);
         this.phaseText.add(attackText);
         this.phaseText.add(reinforceText);
@@ -95,12 +82,13 @@ export default class GameScene extends Phaser.Scene {
         const socket = data.socket;
         
         if (data.fadeIn){
-            this.cameras.main.fadeIn(500, 0, 0, 0)
+            this.cameras.main.fadeIn(500, 0, 0, 0);
+            this.cameras.main.setBackgroundColor('#2694b5');
         }
 
         // --------------------------------------------    Static Objects     --------------------------------------------------
         
-        const nextBtn = this.add.sprite(1835, 975, 'forward-button-up').setInteractive();
+        const nextBtn = this.add.sprite(1835, 975, 'forward-button-up');
         const settingsButton = this.add.sprite(75, 75, 'options-button-up').setInteractive();
 
         // --------------------------------------------    Static Object Logic     --------------------------------------------------
@@ -112,9 +100,9 @@ export default class GameScene extends Phaser.Scene {
             if (this.stage === "deploy"){
 
                 if (this.troopsToAdd > 0) {
-                    disablePlayerSprites(this);
+                    disableInput(this);
                     Swal.fire({
-                        title: 'You still have troops to deploy! Are you sure you want to end deployment?',
+                        title: `You still have ${this.troopsToAdd} troop(s) to deploy! Are you sure you want to end deployment?`,
                         showDenyButton: true,
                         confirmButtonText: 'Continue',
                         denyButtonText: 'Return',
@@ -123,22 +111,59 @@ export default class GameScene extends Phaser.Scene {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             setAttackPhase(this);
+                            attack(this);
                         } 
-                        enablePlayerSprites(this);
+                        enableInput(this);
                     })
                 } else {
                     setAttackPhase(this);
+                    attack(this);
                 }
 
             }
             else if (this.stage === "attack"){
-                attack();
-                setFortifyPhase(this);
+                if (this.attacked === false){
+                    disableInput(this);
+                    Swal.fire({
+                        title: 'You have not attacked! Are you sure you want to skip attacking?',
+                        showDenyButton: true,
+                        confirmButtonText: 'Continue',
+                        denyButtonText: 'Return',
+                        icon : 'warning',
+                        backdrop : false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            setFortifyPhase(this);
+                            fortify(this);
+                        } 
+                        enableInput(this);
+                    });
+                } else {
+                    setFortifyPhase(this);
+                    fortify(this);
+                }
             }
             else if (this.stage === "fortify") {
-                fortify();
-                setDeployPhase(this);
-                socket.emit('endTurn');
+                if (this.movedTroops === false){
+                    disableInput(this);
+                    Swal.fire({
+                        title: 'You have not moved any troop(s)! Are you sure you want to end fortifying?',
+                        showDenyButton: true,
+                        confirmButtonText: 'Continue',
+                        denyButtonText: 'Return',
+                        icon : 'warning',
+                        backdrop : false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            setDeployPhase(this);
+                            socket.emit('endTurn');
+                        } 
+                        enableInput(this);
+                    });
+                } else {
+                    setDeployPhase(this);
+                    socket.emit('endTurn');
+                }
             }
             
         });
@@ -150,17 +175,14 @@ export default class GameScene extends Phaser.Scene {
         
         // --------------------------------------------    Game Start     ---------------------------------------------------------
 
-        initialLoad(this, data.players, socket);
-        
-        renderTerritories(this, 4, 6);
-        if (this.myPlayer.host) {
-            randomizeTerritories(this, socket, this.mapData, data.players);
-        }
-        
-        applyListeners(this);
+        initialLoad(this, socket);
+        renderTerritories(this);
+        applyListeners(this, socket);
 
         if (this.myPlayer.host) {
+            randomizeTerritories(this, socket);
             console.log("LETS DEPLOY!");
+            nextBtn.setInteractive();
             deploy(this);
         }
 
@@ -175,14 +197,14 @@ export default class GameScene extends Phaser.Scene {
             }
             
             for (const key in updatedMapData){
-                const currBox = this.mapData[key].sprite;
-                const updatedBoxData = updatedMapData[key];
-                replaceText(currBox, currBox.textObj, updatedBoxData.troops.toString());
-                colorTransition(this, currBox, currBox.data.color, updatedBoxData.color);
-                currBox.data.troops = updatedBoxData.troops;
-                currBox.data.color = updatedBoxData.color;
-                currBox.data.owner = updatedBoxData.owner;
-                this.playerGroups[updatedBoxData.owner].add(currBox);
+                const currTerritory = this.mapData[key].sprite;
+                const updatedTerritory = updatedMapData[key];
+                currTerritory.data.troops = updatedTerritory.troops;
+                currTerritory.data.owner = updatedTerritory.owner;
+                replaceText(currTerritory);
+                colorTransition(this, currTerritory, currTerritory.data.color, updatedTerritory.color);
+                currTerritory.data.color = updatedTerritory.color;
+                this.playerGroups[updatedTerritory.owner].add(currTerritory);
             }
         });
         
@@ -190,6 +212,7 @@ export default class GameScene extends Phaser.Scene {
         socket.on('nextTurn', (turnNum) => {
             this.stage = "deploy"; //reset stage state
             this.arrows.getChildren()[this.turn-1].setVisible(false); //hide last players arrow
+            nextBtn.disableInteractive(); //diable next turn button every turn
 
             //hide phase text every turn
             this.phaseText.getChildren().forEach(sprite => {
@@ -202,9 +225,10 @@ export default class GameScene extends Phaser.Scene {
             //if its the current clients turn
             if (data.players[this.turn].id === this.myPlayer.id) {
                 console.log("ITS MY TURRN!!!!!!");
+                nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
 
                 //enable the sprites in that clients player group
-                enablePlayerSprites(this);
+                enableInput(this);
                 
                 //show the turn phasing text
                 this.phaseText.getChildren().forEach((sprite, index) => {
@@ -218,19 +242,10 @@ export default class GameScene extends Phaser.Scene {
 
             // else its not my turn
             } else {
-                //disable all sprites
-                for (const key in this.playerGroups){
-                    this.playerGroups[key].getChildren().forEach(sprite => {
-                        sprite.disableInteractive();
-                    });
-                }
-
                 //show waiting for turn text
                 this.phaseText.getChildren()[3].setVisible(true);
             }
         });
-
-        
         
         // --------------------------------------------    Each Turn     --------------------------------------------------
 
@@ -238,28 +253,42 @@ export default class GameScene extends Phaser.Scene {
         socket.on('serverUpdate', (updatedMapData) => {
             // Update the values of the boxes based on the updated clientData received from the server
             for (const key in updatedMapData){
-                const currBox = this.mapData[key].sprite;
-                const updatedBoxData = updatedMapData[key];
-                replaceText(currBox, currBox.textObj, updatedBoxData.troops.toString());
-                colorTransition(this, currBox, currBox.data.color, updatedBoxData.color);
-                currBox.data.troops = updatedBoxData.troops;
-                currBox.data.color = updatedBoxData.color;
-                currBox.data.owner = updatedBoxData.owner;
+                const currTerritory = this.mapData[key].sprite;
+                const updatedTerritory = updatedMapData[key];
+                currTerritory.data.troops = updatedTerritory.troops;
+                currTerritory.data.owner = updatedTerritory.owner;
+                replaceText(currTerritory);
+                colorTransition(this, currTerritory, currTerritory.data.color, updatedTerritory.color);
+                currTerritory.data.color = updatedTerritory.color;
+            }
+        });
+
+        socket.on('serverAttackUpdate', (updatedMapData) => {
+            // Update the values of the boxes based on the updated clientData received from the server
+            shakeScreen(this, 200, 0.02);
+
+            for (const key in updatedMapData){
+                const currTerritory = this.mapData[key].sprite;
+                const updatedTerritory = updatedMapData[key];
+                currTerritory.data.troops = updatedTerritory.troops;
+                currTerritory.data.owner = updatedTerritory.owner;
+                replaceText(currTerritory);
+                colorTransition(this, currTerritory, currTerritory.data.color, updatedTerritory.color);
+                currTerritory.data.color = updatedTerritory.color;
             }
         });
     }
 }
 
-//TODO function that calcs hoy many troops a player has to add on turn, functionality that allows them to add
 //TODO convert from squares to states 
 
-const initialLoad = (scene, playerData, socket) => {
+const initialLoad = (scene, socket) => {
 
     scene.arrows.getChildren()[0].setVisible(true); //initial arrow
 
     for (let i = 0; i < scene.numPlayers; i++){
-        if (socket.id === playerData[i+1].id){
-            scene.myPlayer = playerData[i+1];
+        if (socket.id === scene.players[i+1].id){
+            scene.myPlayer = scene.players[i+1];
             if (i + 1 === 1){
                 scene.phaseText.getChildren().forEach((sprite, index) => {
                     if (index < 3){
@@ -273,109 +302,270 @@ const initialLoad = (scene, playerData, socket) => {
     }
 }
 
-const applyListeners = (scene) => {
-    for (const key in scene.mapData){
-        const box = scene.mapData[key].sprite;
-        box.on('pointerdown', () => {
-            
-            //if stage is deploy
-            // have awindow pops up asking how many to add
-            if (scene.stage === 'deploy'){
-                disablePlayerSprites(scene);
-                Swal.fire({
-                    title: 'How many troops would you like to deploy?',
-                    input: 'range',
-                    inputLabel: 'Troops',
-                    backdrop: false,
-                    inputAttributes: {
-                        min: 0,
-                        max: scene.troopsToAdd,
-                        step: 1
-                    },
-                    inputValue: 0
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const troops = Number(result.value);
-                        if (troops !== 0){
-                            console.log(`Deployed ${troops} troops!`);
-                            scene.troopsToAdd -= troops;
-                            box.data.troops += troops;
-                            replaceText(box, box.textObj, box.data.troops.toString());
+const applyListeners = (scene, socket) => {
+
+    scene.input.on('pointerdown', (pointer) => {
+        console.log("click");
+        //determine if a physics body was clicked on
+        const clickedBody = scene.matter.query.point(scene.matter.world.localWorld.bodies, pointer.position);
+
+        if (scene.inputEnabled && clickedBody.length > 0) {
+            const territory = clickedBody[0];
+            //if the territory belongs to the player
+            if (scene.myPlayer.id === scene.players[scene.turn].id){
+                //if stage is deploy
+                // have awindow pops up asking how many to add
+                if (scene.stage === 'deploy' && territory.gameObject.data.owner === scene.turn){
+                    disableInput(scene);
+                    Swal.fire({
+                        title: `How many troops would you like to deploy to ${territory.gameObject.data.name}?`,
+                        input: 'range',
+                        inputLabel: 'Troops',
+                        backdrop: false,
+                        inputAttributes: {
+                            min: 0,
+                            max: scene.troopsToAdd,
+                            step: 1
+                        },
+                        inputValue: 0
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const troops = Number(result.value);
+                            if (troops !== 0){
+                                console.log(`Deployed ${troops} troops!`);
+                                scene.troopsToAdd -= troops;
+                                const currTerritory = territory.gameObject;
+                                currTerritory.data.troops += troops;
+                                replaceText(currTerritory);
+                                sendDataToServer(scene, socket, "update");
+                            }
+
+                            if (scene.troopsToAdd === 0){
+                                setAttackPhase(scene);
+                                attack(scene);
+                            } 
+                        }
+                        enableInput(scene);
+                    });
+                    
+                } else if (scene.stage === "attack" && territory.gameObject.data.id !== scene.clickedTerritory){
+
+                    if (scene.clickedTerritory === null){
+
+                        if (territory.gameObject.data.owner === scene.turn){
+                            scene.clickedTerritory = territory.gameObject.data.id;
+                            attackPopUp(scene, territory.gameObject.data.name);
                         }
 
-                        if (scene.troopsToAdd === 0){
-                            setAttackPhase(scene);
-                        } 
+                    } else {
+
+                        if (territory.gameObject.data.owner !== scene.turn){
+                            const allowAttack = isValidAttack(scene, scene.clickedTerritory, territory.gameObject.data.id);
+
+                            disableInput(scene);
+                            if (allowAttack) {
+
+                                const firstTerritory = scene.mapData[scene.clickedTerritory].sprite;
+                                console.log(firstTerritory);
+
+                                Swal.fire({
+                                    title: `How many troops would you like to attack ${territory.gameObject.data.name} with?`,
+                                    input: 'range',
+                                    inputLabel: 'Troops',
+                                    backdrop: false,
+                                    inputAttributes: {
+                                        min: 0,
+                                        max: firstTerritory.data.troops - 1,
+                                        step: 1
+                                    },
+                                    inputValue: 0
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        const troops = Number(result.value);
+                                        if (troops !== 0){
+                                            console.log(`Attacked ${territory.gameObject.data.name} with ${troops} troops!`);
+                                            performAttack(scene, scene.clickedTerritory, territory.gameObject, troops);
+                                            scene.attacked = true;
+                                            scene.clickedTerritory = null;
+                                            sendDataToServer(scene, socket, "attackUpdate");
+
+                                        } else {
+                                            attackPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
+                                        }
+                                    }
+                                    enableInput(scene);
+                                });
+
+                            } else {
+                                Swal.fire({
+                                    title: `Can't attack ${territory.gameObject.data.name}`,
+                                    backdrop: false,
+                                    timer : 3000,
+                                    timerProgressBar : true
+                                }).then(() => {
+                                    enableInput(scene);
+                                    attackPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
+                                });
+                            }
+                        }
                     }
-                    enablePlayerSprites(scene);
-                });
-                
-            } else if (scene.stage === "attack"){
-                colorTransition(scene, box, box.data.color, scene.myPlayer.color);
-                box.data.color = scene.myPlayer.color;
-                box.data.owner = scene.myPlayer.id;
+
+                } else if (territory.gameObject.data.id !== scene.clickedTerritory && scene.stage === "fortify" && territory.gameObject.data.owner === scene.turn){
+                    
+                    if (scene.clickedTerritory !== null){
+
+                        const allowFortify = isValidFortify(scene, scene.clickedTerritory, territory.gameObject.data.id);
+                        
+                        disableInput(scene);
+                        if (allowFortify){
+                            
+                            const firstTerritory = scene.mapData[scene.clickedTerritory].sprite;
+                            console.log(firstTerritory);
+
+                            Swal.fire({
+                                title: `How many troops would you like to move to ${territory.gameObject.data.name}?`,
+                                input: 'range',
+                                inputLabel: 'Troops',
+                                backdrop: false,
+                                inputAttributes: {
+                                    min: 0,
+                                    max: firstTerritory.data.troops - 1,
+                                    step: 1
+                                },
+                                inputValue: 0
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const troops = Number(result.value);
+                                    if (troops !== 0){
+                                        console.log(`Moved ${troops} troops to ${territory.gameObject.data.name}!`);
+                                        firstTerritory.data.troops -= troops;
+                                        const currTerritory = territory.gameObject;
+                                        currTerritory.data.troops += troops;
+                                        replaceText(firstTerritory);
+                                        replaceText(currTerritory);
+                                        scene.clickedTerritory = null;
+                                        scene.movedTroops = true;
+                                        sendDataToServer(scene, socket, "update");
+                                        setDeployPhase(scene);
+                                        socket.emit('endTurn');
+                                    } else {
+                                        fortifyPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
+                                    }
+                                }
+                                enableInput(scene);
+                            });
+                        } else {
+                            Swal.fire({
+                                title: `Can't move troops to ${territory.gameObject.data.name}`,
+                                backdrop: false,
+                                timer : 3000,
+                                timerProgressBar : true
+                            }).then(() => {
+                                enableInput(scene);
+                                fortifyPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
+                            });
+                        }
+
+
+                    } else {
+                        scene.clickedTerritory = territory.gameObject.data.id;
+                        fortifyPopUp(scene, territory.gameObject.data.name);
+                    }
+                }
             }
-            
+        }	            
+    });
+}
+
+const renderTerritories = (scene) => {
+
+    const stateData = scene.cache.json.get('state-data');
+    const stateBodies = scene.cache.json.get('state-bodies');
+
+    for (const key in stateData) {
+
+        const x = stateData[key][1];
+        const y = stateData[key][2];
+
+        const state = scene.matter.add.sprite(x, y, 'state-atlas', key);
+        
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (stateData[key][5]){
+            offsetX = stateData[key][5][0];
+            offsetY = stateData[key][5][1];
+        }
+
+        const state_body = scene.matter.add.fromPhysicsEditor(x + 140 + offsetX, y - 220 + offsetY, stateBodies[key]);
+        state.setExistingBody(state_body);
+        state.setScale(stateData[key][3]);
+        
+        const text_value = addText(scene, state, 1, '28px', '#0f0');
+        if (stateData[key][6]){
+            let textOffsetX = stateData[key][6][0];
+            let textOffsetY = stateData[key][6][1];
+            text_value.x = text_value.x + textOffsetX;
+            text_value.y = text_value.y + textOffsetY; 
+            text_value.offsetX = textOffsetX;
+            text_value.offsetY = textOffsetY;
+        }
+        
+        state.data = {};
+        state.data.id = key;
+        state.data.name = stateData[key][0];
+        state.data.owner = null;
+        state.data.color = 0xffffff;
+        state.data.troops = 1;
+        state.data.visited = false;
+        state.textObj = text_value; 
+
+        scene.mapData[key] = 
+        {
+            sprite : state,
+            adjacent : stateData[key][4]
+        }
+        
+    }
+
+    for (const key in scene.mapData){
+        scene.mapData[key].adjacent.forEach((state, index) => {
+            scene.mapData[key].adjacent[index] = scene.mapData[state].sprite;
         });
     }
 }
 
-const renderTerritories = (scene, rows, cols) => {
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            
-            const box = scene.add.sprite((j * scene.sys.game.config.width / 7) + 274, (i * scene.sys.game.config.height / 5) + 120, 'menu-box').disableInteractive();
-            const box_value = addText(scene, box, 1, '28px', '#0f0');
-            
-            box.scale = 0.25;
-            box.data = {};
-            box.data.id =  (i * cols + j) + 1;
-            box.data.owner = null;
-            box.data.color = 0xffffff;
-            box.data.troops = 1;
-            box.textObj = box_value; // Store box_value as a property of box
-            
-            scene.mapData[box.data.id].sprite = box;
-
-            if (j > 0){ // left
-                scene.mapData[box.data.id - 1].adjacent.push(box);
-            }
-            if (j < cols - 1){ // right
-                scene.mapData[box.data.id + 1].adjacent.push(box);
-            }
-            if (i > 0){ // above
-                scene.mapData[box.data.id - cols].adjacent.push(box);
-            }
-            if (i < rows - 1){ //below
-                scene.mapData[box.data.id + cols].adjacent.push(box);
-            }
-
-        }
-    }
-}
-
-const randomizeTerritories = (scene, socket, mapData, players) => {
-    const numTerritories = Object.keys(mapData).length;
-    const numPlayers = Object.keys(players).length;
+const randomizeTerritories = (scene, socket) => {
+    const numTerritories = Object.keys(scene.mapData).length;
+    const numPlayers = Object.keys(scene.players).length;
 
     for (let i = 1; i < numPlayers + 1; i++){
         scene.playerGroups[i] = scene.add.group();
     }
 
+    //for each territory equally distributed
     for (let i = 0; i < numTerritories / numPlayers; i++){
-        for (let j = 1; j < numPlayers + 1; j++){
+        //for each player
+        for (let playerId = 1; playerId < numPlayers + 1; playerId++){
 
-            let num = Math.floor(Math.random() * numTerritories) + 1;
-            let currSprite = mapData[num].sprite;
+            //choose a random territory
+            const territories = Object.keys(scene.mapData);
+            let territory = territories[Math.floor(Math.random() * numTerritories)];
 
-            while (currSprite.data.owner != null) {
-                num = (num % numTerritories) + 1;
-                currSprite = mapData[num].sprite;
+            //grab its sprite
+            let currTerritory = scene.mapData[territory].sprite;
+
+            //find one that isnt already owned
+            while (currTerritory.data.owner != null) {
+                territory = territories[Math.floor(Math.random() * numTerritories)];
+                currTerritory = scene.mapData[territory].sprite;
             }
-            currSprite.data.owner = j;
-            colorTransition(scene, currSprite, currSprite.data.color, players[j].color);
-            currSprite.data.color =  players[j].color;
-            scene.playerGroups[j].add(currSprite);
+
+            //claim it and assign it to player group
+            currTerritory.data.owner = playerId;
+            colorTransition(scene, currTerritory, currTerritory.data.color, scene.players[playerId].color);
+            currTerritory.data.color =  scene.players[playerId].color;
+            scene.playerGroups[playerId].add(currTerritory);
         }
     }
 
@@ -403,22 +593,12 @@ const randomizeTerritories = (scene, socket, mapData, players) => {
                 currentTroops += randNum;
             }
 
-            replaceText(territory, territory.textObj, territory.data.troops.toString());
+            replaceText(territory);
         }
         
     }
 
-    scene.playerGroups[scene.turn].getChildren().forEach(sprite => {
-        sprite.setInteractive();
-    });
-
-    // Send updated data to the server
-    const newData = {};
-    for (const key in mapData){
-        newData[key] = mapData[key].sprite.data;
-    }
-
-    socket.emit('setup', newData);
+    sendDataToServer(scene, socket, 'setup');
 }
 
 const deploy = (scene) => {
@@ -426,7 +606,7 @@ const deploy = (scene) => {
     const troopsForTurn = getTroopsforTurn(scene);
     scene.troopsToAdd = troopsForTurn;
 
-    disablePlayerSprites(scene);
+    disableInput(scene);
     Swal.fire({
         title: 'Deployment Phase!',
         text: `You have ${troopsForTurn} troops to deploy!`,
@@ -434,7 +614,7 @@ const deploy = (scene) => {
         timer : 4000,
         timerProgressBar : true
     }).then(() => {
-        enablePlayerSprites(scene);
+        enableInput(scene);
     });
 
 }
@@ -479,22 +659,237 @@ const setFortifyPhase = (scene) => {
     console.log("go to fortify");
 }
 
-const attack = () => {
+const attack = (scene) => {
 
-}
-
-const fortify = () => {
-
-}
-
-const disablePlayerSprites = (scene) => {
-    scene.playerGroups[scene.turn].getChildren().forEach(sprite => {
-        sprite.disableInteractive();
+    scene.attacked = false;
+    
+    disableInput(scene);
+    Swal.fire({
+        title: 'Attack Phase!',
+        text: `Choose one of your regions to attack an adjacent enemy region!`,
+        backdrop: false,
+        timer : 4000,
+        timerProgressBar : true
+    }).then(() => {
+        enableInput(scene);
     });
+
 }
 
-const enablePlayerSprites = (scene) => {
-    scene.playerGroups[scene.turn].getChildren().forEach(sprite => {
-        sprite.setInteractive();
+const isValidAttack = (scene, start, end) => {
+
+    const adjacentTerritories = scene.mapData[start].adjacent;
+    let isValid = false;
+
+    adjacentTerritories.forEach((territory) => {
+        if (territory.data.id === end) {
+            isValid = true;
+        }
+    })
+
+    return isValid;
+}
+
+const performAttack = (scene, startingId, defender, troopsAttacking) => {
+
+    const attacker = scene.mapData[startingId].sprite;
+    let troopsLeft = troopsAttacking;
+    let troopsDefending = defender.data.troops;
+    
+    while (troopsLeft !== 0 && troopsDefending !== 0){
+        const attackerDice = Math.floor(Math.random() * 6) + 1; //attacker
+        const defenderDice = Math.floor(Math.random() * 6) + 1; //defender
+
+        if (attackerDice > defenderDice){
+            troopsDefending--;
+        } else {
+            troopsLeft--;
+        }
+    }
+    
+    if (troopsDefending === 0) {
+        
+        //update troop count
+        defender.data.troops = troopsLeft;
+        replaceText(defender);
+
+        shakeScreen(scene, 200, .02);
+        
+        //change color 
+        colorTransition(scene, defender, defender.data.color, scene.myPlayer.color);
+        defender.data.color = scene.myPlayer.color;
+        
+        //add and remove from corresponding groups
+        scene.playerGroups[scene.turn].add(defender);
+        scene.playerGroups[defender.data.owner].remove(defender);
+        console.log(scene.playerGroups[defender.data.owner]);
+        defender.data.owner = scene.turn;
+
+        console.log(scene.playerGroups[scene.turn]);
+        
+    } else {
+        defender.data.troops = troopsDefending;
+        replaceText(defender);
+
+        Swal.fire({
+            title: `Attacked Failed!`,
+            backdrop: false,
+            timer : 3000,
+            timerProgressBar : true
+        });
+    }
+
+    attacker.data.troops -= troopsAttacking;
+    replaceText(attacker);
+}
+
+const isValidFortify = (scene, start, end, visited = new Set()) => {
+
+    if (start === end){
+        return true;
+    }
+    
+    visited.add(start);
+    
+    for (let i = 0; i < scene.mapData[start].adjacent.length; i++) {
+    
+        const territory = scene.mapData[start].adjacent[i];
+    
+        if(territory.data.owner === scene.turn && !visited.has(territory.data.id)){
+            if (isValidFortify(scene, territory.data.id, end, visited)){
+                return true;
+            }
+        }
+    };
+    
+    return false;
+}
+
+const fortify = (scene) => {
+
+    scene.movedTroops = false;
+    
+    disableInput(scene);
+    Swal.fire({
+        title: 'Fortify Phase!',
+        text: `Move Troops from one of your regions to another that are connected!`,
+        backdrop: false,
+        timer : 4000,
+        timerProgressBar : true
+    }).then(() => {
+        enableInput(scene);
     });
+
+}
+
+const attackPopUp = (scene, territoryName) => {
+    // Get a reference to the canvas element
+    const canvas = document.querySelector('canvas');
+
+    // Get the position and dimensions of the canvas element
+    const canvasRect = canvas.getBoundingClientRect();
+
+    // Calculate the position and size of the SweetAlert dialog relative to the canvas element
+    const x = canvasRect.left + canvasRect.width * 0.1; // Adjust the x position as needed
+    const y = canvasRect.bottom - canvasRect.height * 0.1; // Adjust the y position as needed
+    let width = canvasRect.width * 0.2; // Adjust the width as needed
+    let height = canvasRect.height * 0.2; // Adjust the height as needed
+
+    height = (height < 195) ? 195 : height;
+    width = (width < 345) ? 345 : width;
+
+    if (scene.mapData[scene.clickedTerritory].sprite.data.troops > 1){
+        Swal.fire({
+            title: `Where would you like to attack from ${territoryName}?`,
+            position: 'bottom-start',
+            showDenyButton: true,
+            denyButtonText: "Cancel",
+            showConfirmButton: false,
+            backdrop: false,
+            customClass: 'attack',
+            didOpen: () => {
+                Swal.getPopup().style.left = `${x}px`;
+                // Swal.getPopup().style.top = `${y}px`;
+                Swal.getPopup().style.width = `${width}px`;
+                Swal.getPopup().style.height = `${height}px`;
+            }
+        }).then(() => {
+            scene.clickedTerritory = null;
+        });
+    } else {
+        disableInput(scene);
+        Swal.fire({
+            title: `Not enough troops in ${territoryName} to attack!`,
+            backdrop: false,
+            timer : 2000,
+            timerProgressBar : true
+        }).then(() => {
+            scene.clickedTerritory = null;
+            enableInput(scene);
+        });
+    }
+}
+
+const fortifyPopUp = (scene, territoryName) => {
+    // Get a reference to the canvas element
+    const canvas = document.querySelector('canvas');
+
+    // Get the position and dimensions of the canvas element
+    const canvasRect = canvas.getBoundingClientRect();
+
+    // Calculate the position and size of the SweetAlert dialog relative to the canvas element
+    const x = canvasRect.left + canvasRect.width * 0.1; // Adjust the x position as needed
+    const y = canvasRect.bottom - canvasRect.height * 0.1; // Adjust the y position as needed
+    let width = canvasRect.width * 0.2; // Adjust the width as needed
+    let height = canvasRect.height * 0.2; // Adjust the height as needed
+
+    height = (height < 195) ? 195 : height;
+    width = (width < 345) ? 345 : width;
+
+    if (scene.mapData[scene.clickedTerritory].sprite.data.troops > 1){
+        Swal.fire({
+            title: `Where would you like to move troops from ${territoryName} to?`,
+            position: 'bottom-start',
+            showDenyButton: true,
+            denyButtonText: "Cancel",
+            showConfirmButton: false,
+            backdrop: false,
+            customClass: 'fortify',
+            didOpen: () => {
+                Swal.getPopup().style.left = `${x}px`;
+                // Swal.getPopup().style.top = `${y}px`;
+                Swal.getPopup().style.width = `${width}px`;
+                Swal.getPopup().style.height = `${height}px`;
+            }
+        }).then(() => {
+            scene.clickedTerritory = null;
+        });
+    } else {
+        disableInput(scene);
+        Swal.fire({
+            title: `Not enough troops in ${territoryName} to move!`,
+            backdrop: false,
+            timer : 2000,
+            timerProgressBar : true
+        }).then(() => {
+            scene.clickedTerritory = null;
+            enableInput(scene);
+        });
+    }
+}
+
+const disableInput = (scene) => {
+    scene.inputEnabled = false;
+}
+
+const enableInput = (scene) => {
+    scene.inputEnabled = true;
+}
+
+const sendDataToServer = (scene, socket, endpoint) => {
+    const newData = {};
+    for (const key in scene.mapData){
+        newData[key] = scene.mapData[key].sprite.data;
+    }
+    socket.emit(endpoint, newData);
 }

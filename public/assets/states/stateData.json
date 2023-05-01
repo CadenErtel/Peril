@@ -1,0 +1,295 @@
+{
+  "california": [
+    "California",
+    264,
+    687,
+    0.6,
+    ["pnw", "nevada", "arizona"],
+    [-124, -19],
+    [-12, 10]
+  ],
+  "nevada": [
+    "Nevada",
+    331,
+    665,
+    0.6,
+    ["california", "pnw", "idaho", "utah", "arizona"],
+    [-89, -50]
+  ],
+  "pnw": [
+    "The Pacific Northwest",
+    285,
+    446,
+    0.6,
+    ["california", "idaho", "nevada"],
+    [-100, -77]
+  ],
+  "idaho": [
+    "Idaho",
+    412,
+    467,
+    0.6,
+    ["pnw", "nevada", "utah", "montana", "wyoming"],
+    [-81, -38]
+  ],
+  "arizona": [
+    "Arizona",
+    419,
+    825,
+    0.6,
+    ["newmexico", "utah", "nevada", "california"],
+    [-69, -10]
+  ],
+  "utah": [
+    "Utah",
+    454,
+    660,
+    0.6,
+    ["idaho", "wyoming", "colorado", "arizona", "newmexico", "nevada"],
+    [-69, -21]
+  ],
+  "montana": [
+    "Montana",
+    535,
+    436,
+    0.6,
+    ["idaho", "wyoming", "dakotas"],
+    [-49, -65]
+  ],
+  "wyoming": [
+    "Wyoming",
+    560,
+    566,
+    0.6,
+    ["idaho", "utah", "montana", "colorado", "dakotas", "nebraska"],
+    [-52, -49]
+  ],
+  "colorado": [
+    "Colorado",
+    598,
+    692,
+    0.6,
+    ["utah", "arizona", "newmexico", "oklahoma", "kansas", "wyoming", "nebraska"],
+    [-43, -28]
+  ],
+  "newmexico": [
+    "New Mexico",
+    568,
+    832,
+    0.6,
+    ["texas", "arizona", "utah", "colorado", "oklahoma"],
+    [-53, 0]
+  ],
+  "texas": [
+    "Texas",
+    716,
+    944,
+    0.6,
+    ["newmexico", "oklahoma", "louisiana", "arkansas"],
+    [0, 0]
+  ],
+  "oklahoma": [
+    "Oklahoma",
+    755,
+    820,
+    0.6,
+    ["texas", "kansas", "newmexico", "colorado", "arkansas", "missouri", "arkansas"],
+    [24, -23]
+  ],
+  "kansas": [
+    "Kansas",
+    766,
+    724,
+    0.6,
+    ["nebraska", "colorado", "oklahoma", "missouri"],
+    [-9, -38]
+  ],
+  "nebraska": [
+    "Nebraska",
+    737,
+    626,
+    0.6,
+    ["dakotas", "wyoming", "colorado", "iowa", "missouri", "kansas"],
+    [-22, -50]
+  ],
+  "dakotas": [
+    "The Dakotas",
+    727,
+    493,
+    0.6,
+    ["montana", "wyoming", "nebraska", "iowa", "minnesota"],
+    [-23, -70]
+  ],
+  "minnesota": [
+    "Minnesota",
+    870,
+    484,
+    0.6,
+    ["dakotas", "iowa", "wisconsin"],
+    [-13, -86]
+  ],
+  "iowa": [
+    "Iowa",
+    879,
+    613,
+    0.6,
+    ["minnesota", "dakotas", "nebraska", "missouri", "illinois", "wisconsin"],
+    [4, -64]
+  ],
+  "missouri": [
+    "Missouri",
+    909,
+    727,
+    0.6,
+    ["iowa", "nebraska", "kansas", "oklahoma", "arkansas", "tennessee", "kentucky", "illinois"],
+    [13, -40]
+  ],
+  "arkansas": [
+    "Arkansas",
+    913,
+    840,
+    0.6,
+    ["missouri", "oklahoma", "texas", "louisiana"],
+    [14, -22]
+  ],
+  "louisiana": [
+    "Louisiana",
+    936,
+    951,
+    0.6,
+    ["texas", "arkansas", "missisippi"],
+    [17, 10],
+    [0, 17]
+  ],
+  "illinois": [
+    "Illinois",
+    973,
+    674,
+    0.6,
+    ["wisconsin", "iowa", "missouri", "kentucky", "indiana", "michigan"],
+    [30, -51]
+  ],
+  "wisconsin": [
+    "Wisconsin",
+    985,
+    521,
+    0.6,
+    ["minnesota", "michigan", "iowa", "illinois"],
+    [6, -78]
+  ],
+  "missisippi": [
+    "Missisippi",
+    974,
+    893,
+    0.6,
+    ["louisiana", "arkansas", "tennessee", "alabama"],
+    [38, -5]
+  ],
+  "alabama": [
+    "Alabama",
+    1054,
+    888,
+    0.6,
+    ["missisippi", "florida", "georgia", "tennessee"],
+    [44, -3]
+  ],
+  "georgia": [
+    "Georgia",
+    1139,
+    877,
+    0.6,
+    ["carolinas", "florida", "tennessee", "alabama"],
+    [65, 2]
+  ],
+  "florida": [
+    "Florida",
+    1145,
+    1019,
+    0.6,
+    ["georgia", "alabama"],
+    [109, 0],
+    [28, 10]
+  ],
+  "tennessee": [
+    "Tennessee",
+    1063,
+    788,
+    0.6,
+    ["carolinas", "virginias", "georgia", "alabama", "missisippi", "arkansas", "missouri", "kentucky"],
+    [36, -22]
+  ],
+  "carolinas": [
+    "The Carolinas",
+    1209,
+    810,
+    0.6,
+    ["tennessee", "virginias", "georgia"],
+    [87, -35]
+  ],
+  "kentucky": [
+    "Kentucky",
+    1065,
+    731,
+    0.6,
+    ["virginias", "ohio", "indiana", "illinois", "missouri", "tennessee"],
+    [50, -31]
+  ],
+  "virginias": [
+    "The Virginias",
+    1210,
+    691,
+    0.6,
+    ["maryland_delaware", "carolinas", "northeast", "ohio", "kentucky", "tennessee"],
+    [60, -28]
+  ],
+  "indiana": [
+    "Indiana",
+    1047,
+    668,
+    0.6,
+    ["ohio", "illinois", "kentucky", "michigan"],
+    [33, -48]
+  ],
+  "ohio": [
+    "Ohio",
+    1122,
+    644,
+    0.6,
+    ["indiana", "kentucky", "virginias", "northeast"],
+    [45, -51]
+  ],
+  "maryland_delaware": [
+    "Maryland",
+    1250,
+    667,
+    0.6,
+    ["northeast", "virginias"],
+    [99, -54],
+    [8, 3]
+  ],
+  "northeast": [
+    "The Northeast",
+    1243,
+    558,
+    0.6,
+    ["maryland_delaware", "ohio", "new_england", "virginias"],
+    [85, -52]
+  ],
+  "new_england": [
+    "New England",
+    1368,
+    482,
+    0.6,
+    ["northeast"],
+    [92, -90],
+    [-14, 3]
+  ],
+  "michigan": [
+    "Michigan",
+    1067,
+    549,
+    0.6,
+    ["wisconsin", "indiana", "ohio", "northeast", "illinois"],
+    [40, -62]
+  ]
+}

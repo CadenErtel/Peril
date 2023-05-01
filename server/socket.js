@@ -61,6 +61,16 @@ module.exports = function(io) {
             socket.to(roomCode).emit('setupTerritories', clientData);
         });
 
+        socket.on("update", (updateData) => {
+            const roomCode = socket.data.roomCode;
+            socket.to(roomCode).emit('serverUpdate', updateData);
+        });
+
+        socket.on("attackUpdate", (updateData) => {
+            const roomCode = socket.data.roomCode;
+            socket.to(roomCode).emit('serverAttackUpdate', updateData);
+        });
+
         socket.on('endTurn', () => {
             const roomCode = socket.data.roomCode;
             rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;
@@ -157,16 +167,16 @@ module.exports = function(io) {
         
         switch (playerNum) {
             case 1:
-                return 0xff0000;
+                return 0xdd79b5; //pink
                 break;
             case 2:
-                return 0x0000ff;
+                return 0x1B4079; //blue
                 break;
             case 3:
-                return 0xffff00;
+                return 0x8e579a; //purple
                 break;
             case 4:    
-                return 0x00ff00;
+                return 0x70798C; //gray
                 break;
             default:
                 return 0x808080;

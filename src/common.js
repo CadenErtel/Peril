@@ -59,7 +59,13 @@ export function addText (scene, sprite, text, size, color) {
     return word;
 }
 
-export function replaceText(sprite, textObject, text) {
+export function replaceText(sprite) {
+    const textObject = sprite.textObj;
+    const text = sprite.data.troops.toString();
+
     textObject.setText(text);
-    textObject.setPosition(sprite.x - textObject.width / 2, sprite.y - textObject.height /2);
+
+    const offsetX = textObject.offsetX ? textObject.offsetX : 0
+    const offsetY = textObject.offsetY ? textObject.offsetY : 0
+    textObject.setPosition(sprite.x - textObject.width / 2 + offsetX, sprite.y - textObject.height / 2 + offsetY);
 }
