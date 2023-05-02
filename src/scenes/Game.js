@@ -11,6 +11,7 @@ export default class GameScene extends Phaser.Scene {
         this.troopsToAdd = 0;
         this.movedTroops = false;
         this.attacked = false;
+        this.hasLost = false;
         this.mapData = {};
 	}
     
@@ -65,13 +66,16 @@ export default class GameScene extends Phaser.Scene {
         const attackText = this.add.text(width / 2, height - 100, "Attack", {fontSize : "24px"}).setOrigin(.5);
         const reinforceText = this.add.text(width / 2 + 150, height - 100, "Fortify", {fontSize : "24px"}).setOrigin(.5);
         const waitTurnText = this.add.text(width / 2, height - 100, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
-        
+        const gameOverText = this.add.text(width / 2, height - 100, "You Lost!", {fontSize : "36px"}).setOrigin(.5);
+
         deployText.setTint(0x00FF00);
         
         this.phaseText.add(deployText);
         this.phaseText.add(attackText);
         this.phaseText.add(reinforceText);
         this.phaseText.add(waitTurnText);
+        this.phaseText.add(gameOverText);
+
         this.phaseText.getChildren().forEach(sprite => {
             sprite.setVisible(false);
         })
@@ -225,20 +229,23 @@ export default class GameScene extends Phaser.Scene {
             //if its the current clients turn
             if (data.players[this.turn].id === this.myPlayer.id) {
                 console.log("ITS MY TURRN!!!!!!");
-                nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
 
-                //enable the sprites in that clients player group
-                enableInput(this);
-                
-                //show the turn phasing text
-                this.phaseText.getChildren().forEach((sprite, index) => {
-                    if (index < 3){
-                        sprite.setVisible(true);
-                    }
-                });
-
-                //start deploy turn
-                deploy(this);
+                if (this.hasLost === false) {
+                    nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
+                    
+                    //show the turn phasing text
+                    this.phaseText.getChildren().forEach((sprite, index) => {
+                        if (index < 3){
+                            sprite.setVisible(true);
+                        }
+                    });
+    
+                    //start deploy turn
+                    deploy(this);
+                } else {
+                    this.phaseText.getChildren()[4].setVisible(true);
+                    socket.emit('endTurn');
+                }
 
             // else its not my turn
             } else {
