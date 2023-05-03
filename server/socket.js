@@ -11,7 +11,7 @@ module.exports = function(io) {
             while (roomCode in rooms) { 
                 roomCode = generateRoomCode();
             }
-            rooms[roomCode] = { players: 1 , started : false};
+            rooms[roomCode] = { players: 1 , started : false, lastTurn : 0};
             socket.join(roomCode);
             socket.data.nickname = nickname;
             socket.data.roomCode = roomCode;
@@ -71,10 +71,18 @@ module.exports = function(io) {
             socket.to(roomCode).emit('serverAttackUpdate', updateData);
         });
 
-        socket.on('endTurn', () => {
+        socket.on('endTurn', (number) => {
+            console.log(`Player ${number} ended their turn!`);
             const roomCode = socket.data.roomCode;
-            rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;
-            io.to(roomCode).emit('nextTurn', rooms[roomCode].turn);
+            if (rooms[roomCode].lastTurn !== number){
+                rooms[roomCode].lastTurn = number;
+                rooms[roomCode].turn = (rooms[roomCode].turn % rooms[roomCode].players) + 1;
+                io.to(roomCode).emit('nextTurn', rooms[roomCode].turn);
+            }
+        });
+
+        socket.on('gameOver', () => {
+
         });
 
         // ============================ DISCONNECTS ==============================
@@ -155,7 +163,7 @@ module.exports = function(io) {
         const playerData = {}
 
         for (const socket of sockets) {
-            playerData[socket.data.player] = {id : socket.id, nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode, color : socket.data.color};
+            playerData[socket.data.player] = {id : socket.id, playerNum: socket.data.player, nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode, color : socket.data.color};
         }
 
         console.log(playerData);
