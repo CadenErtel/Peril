@@ -226,10 +226,11 @@ export default class GameScene extends Phaser.Scene {
             this.turn = turnNum;
             this.arrows.getChildren()[this.turn-1].setVisible(true); //show current player arrow
 
-            //if the client hasnt lost
-            if (this.hasLost === false) {
-                //if its the current clients turn
-                if (data.players[this.turn].id === this.myPlayer.id) {
+            //if its the current clients turn
+            if (data.players[this.turn].id === this.myPlayer.id) {
+                
+                //if the client hasnt lost
+                if (this.hasLost === false) {
                     console.log("ITS MY TURRN!!!!!!");
 
                     nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
@@ -243,15 +244,19 @@ export default class GameScene extends Phaser.Scene {
     
                     //start deploy turn
                     deploy(this);
-                    
-                    // else its not my turn
                 } else {
-                    //show waiting for turn text
-                    this.phaseText.getChildren()[3].setVisible(true);
+                    this.phaseText.getChildren()[4].setVisible(true);
+                    socket.emit('endTurn', this.myPlayer.playerNum);
                 }
+                
+                // else its not my turn
             } else {
-                this.phaseText.getChildren()[4].setVisible(true);
-                socket.emit('endTurn', this.myPlayer.playerNum);
+                //show waiting for turn text
+                if (this.hasLost === false) {
+                    this.phaseText.getChildren()[3].setVisible(true);
+                } else {
+                    this.phaseText.getChildren()[4].setVisible(true);
+                }
             }
         });
         
