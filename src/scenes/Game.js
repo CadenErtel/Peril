@@ -296,6 +296,25 @@ export default class GameScene extends Phaser.Scene {
 
             checkWin(this, socket);
         });
+
+        socket.on('gameEnd', () => {
+            disableInput(this);
+            Swal.fire({
+                title: 'Thanks for playing!',
+                text: `Hope you had fun :)`,
+                backdrop: false,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showDenyButton: true,
+                denyButtonText: "Leave Game",
+
+            }).then((result) => {
+                if (result.isDenied){
+                    location.reload();
+                }
+            });
+        });
     }
 }
 
@@ -305,6 +324,9 @@ const initialLoad = (scene, socket) => {
 
     for (let i = 0; i < scene.numPlayers; i++){
         if (socket.id === scene.players[i+1].id){
+
+            scene.add.text(scene.sys.game.config.width - 76, ((i * scene.sys.game.config.height) / 10) + 376, "★", {fontSize : "32px"}).setOrigin(.5);
+
             scene.myPlayer = scene.players[i+1];
             if (i + 1 === 1){
                 scene.phaseText.getChildren().forEach((sprite, index) => {
@@ -323,6 +345,7 @@ const applyListeners = (scene, socket) => {
 
     scene.input.on('pointerdown', (pointer) => {
         console.log("click");
+
         //determine if a physics body was clicked on
         const clickedBody = scene.matter.query.point(scene.matter.world.localWorld.bodies, pointer.position);
 
@@ -341,7 +364,7 @@ const applyListeners = (scene, socket) => {
                         backdrop: false,
                         inputAttributes: {
                             min: 0,
-                            max: scene.troopsToAdd,
+                            max: scene.troopsToAdd + 800,
                             step: 1
                         },
                         inputValue: 0
@@ -357,7 +380,7 @@ const applyListeners = (scene, socket) => {
                                 sendDataToServer(scene, socket, "update");
                             }
 
-                            if (scene.troopsToAdd === 0){
+                            if (scene.troopsToAdd <= 0){
                                 setAttackPhase(scene);
                                 attack(scene);
                             } 
@@ -903,17 +926,28 @@ const checkWin = (scene, socket) => {
     for (let i = 1; i < numPlayers + 1; i++){
         if (i === scene.myPlayer.playerNum){
             if (scene.playerGroups[i].getChildren().length === 0){
-                scene.hasLost = true;
-                disableInput(scene);
-                Swal.fire({
-                    title: 'You Lost!',
-                    text: `You can still watch until the game is over!`,
-                    backdrop: false,
-                    timer : 10000,
-                    timerProgressBar : true
-                }).then(() => {
-                    enableInput(scene);
-                });
+
+                if (scene.hasLost === false){
+                    scene.hasLost = true;
+                    disableInput(scene);
+                    Swal.fire({
+                        title: 'You Lost!',
+                        text: `You can still watch until the game is over!`,
+                        backdrop: false,
+                        timer : 10000,
+                        timerProgressBar : true
+                    }).then(() => {
+                        enableInput(scene);
+                    });
+    
+                    //hide any text
+                    scene.phaseText.getChildren().forEach(sprite => {
+                        sprite.setVisible(false);
+                    })
+    
+                    //show you lost text
+                    scene.phaseText.getChildren()[4].setVisible(true);
+                }
             }
 
             if (scene.playerGroups[i].getChildren().length === numTerritories){

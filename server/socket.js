@@ -82,7 +82,8 @@ module.exports = function(io) {
         });
 
         socket.on('gameOver', () => {
-
+            const roomCode = socket.data.roomCode;
+            io.to(roomCode).emit('gameEnd');
         });
 
         // ============================ DISCONNECTS ==============================
