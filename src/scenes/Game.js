@@ -11,6 +11,7 @@ export default class GameScene extends Phaser.Scene {
         this.troopsToAdd = 0;
         this.movedTroops = false;
         this.attacked = false;
+        this.hasLost = false;
         this.mapData = {};
 	}
     
@@ -65,13 +66,16 @@ export default class GameScene extends Phaser.Scene {
         const attackText = this.add.text(width / 2, height - 100, "Attack", {fontSize : "24px"}).setOrigin(.5);
         const reinforceText = this.add.text(width / 2 + 150, height - 100, "Fortify", {fontSize : "24px"}).setOrigin(.5);
         const waitTurnText = this.add.text(width / 2, height - 100, "Waiting For Turn!", {fontSize : "36px"}).setOrigin(.5);
-        
+        const gameOverText = this.add.text(width / 2, height - 100, "You Lost!", {fontSize : "36px"}).setOrigin(.5);
+
         deployText.setTint(0x00FF00);
         
         this.phaseText.add(deployText);
         this.phaseText.add(attackText);
         this.phaseText.add(reinforceText);
         this.phaseText.add(waitTurnText);
+        this.phaseText.add(gameOverText);
+
         this.phaseText.getChildren().forEach(sprite => {
             sprite.setVisible(false);
         })
@@ -156,13 +160,13 @@ export default class GameScene extends Phaser.Scene {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             setDeployPhase(this);
-                            socket.emit('endTurn');
+                            socket.emit('endTurn', this.myPlayer.playerNum);
                         } 
                         enableInput(this);
                     });
                 } else {
                     setDeployPhase(this);
-                    socket.emit('endTurn');
+                    socket.emit('endTurn', this.myPlayer.playerNum);
                 }
             }
             
@@ -211,39 +215,48 @@ export default class GameScene extends Phaser.Scene {
 
         socket.on('nextTurn', (turnNum) => {
             this.stage = "deploy"; //reset stage state
-            this.arrows.getChildren()[this.turn-1].setVisible(false); //hide last players arrow
             nextBtn.disableInteractive(); //diable next turn button every turn
-
+            
             //hide phase text every turn
             this.phaseText.getChildren().forEach(sprite => {
                 sprite.setVisible(false);
             })
-
+            
+            this.arrows.getChildren()[this.turn-1].setVisible(false); //hide last players arrow
             this.turn = turnNum;
             this.arrows.getChildren()[this.turn-1].setVisible(true); //show current player arrow
 
             //if its the current clients turn
             if (data.players[this.turn].id === this.myPlayer.id) {
-                console.log("ITS MY TURRN!!!!!!");
-                nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
-
-                //enable the sprites in that clients player group
-                enableInput(this);
                 
-                //show the turn phasing text
-                this.phaseText.getChildren().forEach((sprite, index) => {
-                    if (index < 3){
-                        sprite.setVisible(true);
-                    }
-                });
+                //if the client hasnt lost
+                if (this.hasLost === false) {
+                    console.log("ITS MY TURRN!!!!!!");
 
-                //start deploy turn
-                deploy(this);
-
-            // else its not my turn
+                    nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
+                    
+                    //show the turn phasing text
+                    this.phaseText.getChildren().forEach((sprite, index) => {
+                        if (index < 3){
+                            sprite.setVisible(true);
+                        }
+                    });
+    
+                    //start deploy turn
+                    deploy(this);
+                } else {
+                    this.phaseText.getChildren()[4].setVisible(true);
+                    socket.emit('endTurn', this.myPlayer.playerNum);
+                }
+                
+                // else its not my turn
             } else {
                 //show waiting for turn text
-                this.phaseText.getChildren()[3].setVisible(true);
+                if (this.hasLost === false) {
+                    this.phaseText.getChildren()[3].setVisible(true);
+                } else {
+                    this.phaseText.getChildren()[4].setVisible(true);
+                }
             }
         });
         
@@ -270,17 +283,40 @@ export default class GameScene extends Phaser.Scene {
             for (const key in updatedMapData){
                 const currTerritory = this.mapData[key].sprite;
                 const updatedTerritory = updatedMapData[key];
+                if (currTerritory.data.owner !== updatedTerritory.owner){
+                    this.playerGroups[updatedTerritory.owner].add(currTerritory);
+                    this.playerGroups[currTerritory.data.owner].remove(currTerritory);
+                }
                 currTerritory.data.troops = updatedTerritory.troops;
                 currTerritory.data.owner = updatedTerritory.owner;
                 replaceText(currTerritory);
                 colorTransition(this, currTerritory, currTerritory.data.color, updatedTerritory.color);
                 currTerritory.data.color = updatedTerritory.color;
             }
+
+            checkWin(this, socket);
+        });
+
+        socket.on('gameEnd', () => {
+            disableInput(this);
+            Swal.fire({
+                title: 'Thanks for playing!',
+                text: `Hope you had fun :)`,
+                backdrop: false,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showDenyButton: true,
+                denyButtonText: "Leave Game",
+
+            }).then((result) => {
+                if (result.isDenied){
+                    location.reload();
+                }
+            });
         });
     }
 }
-
-//TODO convert from squares to states 
 
 const initialLoad = (scene, socket) => {
 
@@ -288,6 +324,9 @@ const initialLoad = (scene, socket) => {
 
     for (let i = 0; i < scene.numPlayers; i++){
         if (socket.id === scene.players[i+1].id){
+
+            scene.add.text(scene.sys.game.config.width - 76, ((i * scene.sys.game.config.height) / 10) + 376, "★", {fontSize : "32px"}).setOrigin(.5);
+
             scene.myPlayer = scene.players[i+1];
             if (i + 1 === 1){
                 scene.phaseText.getChildren().forEach((sprite, index) => {
@@ -306,6 +345,7 @@ const applyListeners = (scene, socket) => {
 
     scene.input.on('pointerdown', (pointer) => {
         console.log("click");
+
         //determine if a physics body was clicked on
         const clickedBody = scene.matter.query.point(scene.matter.world.localWorld.bodies, pointer.position);
 
@@ -324,7 +364,7 @@ const applyListeners = (scene, socket) => {
                         backdrop: false,
                         inputAttributes: {
                             min: 0,
-                            max: scene.troopsToAdd,
+                            max: scene.troopsToAdd + 800,
                             step: 1
                         },
                         inputValue: 0
@@ -340,7 +380,7 @@ const applyListeners = (scene, socket) => {
                                 sendDataToServer(scene, socket, "update");
                             }
 
-                            if (scene.troopsToAdd === 0){
+                            if (scene.troopsToAdd <= 0){
                                 setAttackPhase(scene);
                                 attack(scene);
                             } 
@@ -388,7 +428,7 @@ const applyListeners = (scene, socket) => {
                                             scene.attacked = true;
                                             scene.clickedTerritory = null;
                                             sendDataToServer(scene, socket, "attackUpdate");
-
+                                            checkWin(scene, socket);
                                         } else {
                                             attackPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
                                         }
@@ -447,7 +487,7 @@ const applyListeners = (scene, socket) => {
                                         scene.movedTroops = true;
                                         sendDataToServer(scene, socket, "update");
                                         setDeployPhase(scene);
-                                        socket.emit('endTurn');
+                                        socket.emit('endTurn', scene.myPlayer.playerNum);
                                     } else {
                                         fortifyPopUp(scene, scene.mapData[scene.clickedTerritory].sprite.data.name);
                                     }
@@ -875,6 +915,55 @@ const fortifyPopUp = (scene, territoryName) => {
             scene.clickedTerritory = null;
             enableInput(scene);
         });
+    }
+}
+
+const checkWin = (scene, socket) => {
+    console.log(scene.myPlayer);
+    const numTerritories = Object.keys(scene.mapData).length;
+    const numPlayers = Object.keys(scene.players).length;
+
+    for (let i = 1; i < numPlayers + 1; i++){
+        if (i === scene.myPlayer.playerNum){
+            if (scene.playerGroups[i].getChildren().length === 0){
+
+                if (scene.hasLost === false){
+                    scene.hasLost = true;
+                    disableInput(scene);
+                    Swal.fire({
+                        title: 'You Lost!',
+                        text: `You can still watch until the game is over!`,
+                        backdrop: false,
+                        timer : 10000,
+                        timerProgressBar : true
+                    }).then(() => {
+                        enableInput(scene);
+                    });
+    
+                    //hide any text
+                    scene.phaseText.getChildren().forEach(sprite => {
+                        sprite.setVisible(false);
+                    })
+    
+                    //show you lost text
+                    scene.phaseText.getChildren()[4].setVisible(true);
+                }
+            }
+
+            if (scene.playerGroups[i].getChildren().length === numTerritories){
+                disableInput(scene);
+                Swal.fire({
+                    title: 'You Won!',
+                    text: `Congratulations!`,
+                    backdrop: false,
+                    timer : 10000,
+                    timerProgressBar : true
+                }).then(() => {
+                    enableInput(scene);
+                });
+                socket.emit('gameOver');
+            }
+        }
     }
 }
 

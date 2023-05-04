@@ -10,6 +10,7 @@ export default class OptionsScene extends Phaser.Scene {
     preload () {
         this.load.image('menu-box', 'assets/images/menu-box.png');
         this.load.atlas('options-atlas', 'assets/atlas/options/buttons.png', 'assets/atlas/options/buttons.json');
+        this.load.image('map', 'assets/images/map.png');
 
         this.players = [];
         this.playerData = {};
@@ -89,6 +90,9 @@ export default class OptionsScene extends Phaser.Scene {
         bg.displayHeight = height;
 
         this.add.image(width / 10, height / 2, 'menu-box').setOrigin(0,0.5);
+
+        this.add.image(width / 4 + 95, height / 2, 'map').setOrigin(.5).setScale(.5);
+        this.add.text(width / 4 + 95, height / 2 + 275, "United States", {fontFamily : "blazma", fontSize : "64px"}).setOrigin(.5);
 
         this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
         this.add.text(width / 2 + 210, 85, `${data.players[1].roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);

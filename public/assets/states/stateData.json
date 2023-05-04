@@ -149,7 +149,7 @@
     913,
     840,
     0.6,
-    ["missouri", "oklahoma", "texas", "louisiana"],
+    ["missouri", "oklahoma", "texas", "louisiana", "missisippi", "tennessee"],
     [14, -22]
   ],
   "louisiana": [
@@ -255,7 +255,7 @@
     1122,
     644,
     0.6,
-    ["indiana", "kentucky", "virginias", "northeast"],
+    ["indiana", "kentucky", "virginias", "northeast", "michigan"],
     [45, -51]
   ],
   "maryland_delaware": [
