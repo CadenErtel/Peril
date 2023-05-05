@@ -26,24 +26,23 @@ module.exports = function(io) {
             const room = rooms[roomCode];
             if (room) {
                 if (room.players < 4) {
-                    socket.join(roomCode);
-                    room.players += 1;
-                    socket.data.nickname = nickname;
-                    socket.data.roomCode = roomCode;
-                    socket.data.player = room.players;
-                    socket.data.host = false;
-                    socket.data.color = assignColor(socket.data.player);
-                    playersToSocket(socket, 'roomJoined', roomCode);
-                    playersToRoom(socket, roomCode);
+                    checkNickname(socket, roomCode, nickname);
                 } else {
                     socket.emit('error', "This room is already full!");
                 }
-
             } else {
-                socket.emit('error', "This is not a valid room code!");
+                socket.emit('error', "This room no longer exists!");
             }
             console.log(rooms);
         });
+
+        socket.on('checkRoomCode', (roomCode) => {
+            if (rooms[roomCode]){
+                socket.emit('getNickname', roomCode);
+            } else {
+                socket.emit('error', "This is not a valid room code!");
+            }
+        }); 
 
         // ============================ OPTIONS ==============================
 
@@ -83,7 +82,7 @@ module.exports = function(io) {
 
         socket.on('gameOver', () => {
             const roomCode = socket.data.roomCode;
-            io.to(roomCode).emit('gameEnd');
+            io.to(roomCode).emit('gameEnd', false);
         });
 
         // ============================ DISCONNECTS ==============================
@@ -113,6 +112,7 @@ module.exports = function(io) {
             const roomCode = socket.data.roomCode;
             const room = rooms[roomCode];
             if (room) {
+
                 room.players -= 1;
                 socket.leave(roomCode);
                 resetPlayerNum(roomCode, socket.data.player);
@@ -126,6 +126,10 @@ module.exports = function(io) {
                 socket.data.roomCode = null;
                 socket.data.host = null;
                 socket.data.player = null;
+
+                if (room.started){
+                    io.to(roomCode).emit("gameEnd", true);
+                }
             }
             console.log(rooms);
         });
@@ -154,7 +158,6 @@ module.exports = function(io) {
 
     async function playersToRoom(socket, roomCode){
         const data = await getPlayers(roomCode);
-        console.log(data);
         socket.to(roomCode).emit('newPlayer', data);
     }
 
@@ -167,9 +170,39 @@ module.exports = function(io) {
             playerData[socket.data.player] = {id : socket.id, playerNum: socket.data.player, nickname : socket.data.nickname, host : socket.data.host, roomCode : socket.data.roomCode, color : socket.data.color};
         }
 
-        console.log(playerData);
 
         return playerData;
+    }
+
+    async function checkNickname(socket, roomCode, nickname){
+        
+        const players = await getPlayers(roomCode);
+        let check = true;
+
+        for (const key in players) {
+            if (players[key].nickname === nickname){
+                check = false;
+            }
+        }
+
+        if (check) {
+            const room = rooms[roomCode];
+            if (room) {
+                socket.join(roomCode);
+                room.players += 1;
+                socket.data.nickname = nickname;
+                socket.data.roomCode = roomCode;
+                socket.data.player = room.players;
+                socket.data.host = false;
+                socket.data.color = assignColor(socket.data.player);
+                playersToSocket(socket, 'roomJoined', roomCode);
+                playersToRoom(socket, roomCode);
+            } else {
+                socket.emit('error', "This room no longer exists!");
+            }
+        } else {
+            socket.emit('error', "This nickname is already in use!");
+        }
     }
 
     function assignColor(playerNum){
@@ -204,3 +237,4 @@ function generateRoomCode() {
     }
     return code;
 }
+
