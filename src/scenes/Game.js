@@ -364,7 +364,7 @@ const applyListeners = (scene, socket) => {
                         backdrop: false,
                         inputAttributes: {
                             min: 0,
-                            max: scene.troopsToAdd + 800,
+                            max: scene.troopsToAdd,
                             step: 1
                         },
                         inputValue: 0
