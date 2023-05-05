@@ -172,9 +172,46 @@ export default class GameScene extends Phaser.Scene {
             
         });
 
-        
         settingsButton.on('pointerdown', () => {
+            disableInput(this);
             this.sound.play('button-press-sound');
+            Swal.fire({
+                title: 'Settings',
+                backdrop: false,
+                showConfirmButton: true,
+                showCancelButton: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showDenyButton: true,
+                denyButtonText: "Leave Game", //reload page
+                confirmButtonText: "Return to Game", //goes back to game
+                cancelButtonText: "Rules"
+
+            }).then((result) => {
+                if (result.isDenied){
+                    location.reload();
+                }
+                else if (result.isDismissed){
+                    Swal.fire({
+                        title: 'Rules',
+                        html : `<h4> Deploy: Pick a territory and use the slider to select how many troops to add to that state. </br> </br>
+                                     Attack: Select a territory that you own first, then select an adjacent territory thats owned by someone else to attack. Use the slider to deploy troops and attack.</br> </br>
+                                     Fortify: Select a territory that belongs to you with more than 1 troop in it, then select another territory of yours that is contiguous to the first territory to transfer troops to. </h4>`,
+                        backdrop: false,
+                        showConfirmButton: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        confirmButtonText: "Return to Game", //goes back to game
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            enableInput(this);
+                        }
+                    })
+                } else if (result.isConfirmed) {
+                    enableInput(this);
+                }
+            });
+            
         });
         
         // --------------------------------------------    Game Start     ---------------------------------------------------------
@@ -297,10 +334,13 @@ export default class GameScene extends Phaser.Scene {
             checkWin(this, socket);
         });
 
-        socket.on('gameEnd', () => {
+        socket.on('gameEnd', (earlyDisconnect) => {
+            const message = earlyDisconnect ? "Someone Disconnected Early! The Game is now over!" : "Thanks for Playing!";
+            nextBtn.disableInteractive();
+            settingsButton.disableInteractive();
             disableInput(this);
             Swal.fire({
-                title: 'Thanks for playing!',
+                title: message,
                 text: `Hope you had fun :)`,
                 backdrop: false,
                 showConfirmButton: false,
@@ -364,7 +404,7 @@ const applyListeners = (scene, socket) => {
                         backdrop: false,
                         inputAttributes: {
                             min: 0,
-                            max: scene.troopsToAdd + 800,
+                            max: scene.troopsToAdd,
                             step: 1
                         },
                         inputValue: 0

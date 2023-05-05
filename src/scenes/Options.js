@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import Swal from 'sweetalert2';
 import {fadeOut, buttonPress} from '../common';
 
 export default class OptionsScene extends Phaser.Scene {
@@ -55,7 +56,6 @@ export default class OptionsScene extends Phaser.Scene {
 
             const count = Object.keys(players).length;
             console.log("New Player Joined or Left!");
-
             for (let i = 0; i < count; i++){
                 let nickname = players[i+1].nickname;
                 if (i === 0){
@@ -94,8 +94,25 @@ export default class OptionsScene extends Phaser.Scene {
         this.add.image(width / 4 + 95, height / 2, 'map').setOrigin(.5).setScale(.5);
         this.add.text(width / 4 + 95, height / 2 + 275, "United States", {fontFamily : "blazma", fontSize : "64px"}).setOrigin(.5);
 
-        this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
-        this.add.text(width / 2 + 210, 85, `${data.players[1].roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
+       this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
+       
+       let roomCode = this.add.text(width / 2 + 210, 85, `${data.players[1].roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
+       roomCode.setInteractive();
+       roomCode.on('pointerdown', function () {
+            navigator.clipboard.writeText(roomCode.text);
+            startBtn.disableInteractive();
+            Swal.fire({
+                title: 'Copied Room Code!',
+                backdrop: false,
+                showConfirmButton: true,
+                allowEscapeKey: true,
+                confirmButtonText: "Ok",
+                timer : 1000,
+                timerProgressBar : true
+            }).then(() => {
+                startBtn.setInteractive();
+            });
+       }); 
 
         this.add.text(240, height / 6, "Lobby Information", {fontFamily : "blazma", fontSize : "72px"});
 
@@ -116,9 +133,23 @@ export default class OptionsScene extends Phaser.Scene {
             startBtn.setInteractive();
         }
         startBtn.on('pointerdown', () => {
-            socket.emit('startGame');
             this.sound.play('button-press-sound');
             buttonPress('options-atlas','start', startBtn);
+            if (Object.keys(this.playerData).length > 1) {
+                socket.emit('startGame');
+            } else {
+                startBtn.disableInteractive();
+                Swal.fire({
+                    title: 'Not Enough Players!',
+                    icon : 'error',
+                    backdrop: false,
+                    showConfirmButton: true,
+                    allowEscapeKey: false,
+                    confirmButtonText: "Ok"
+                }).then(() => {
+                    startBtn.setInteractive();
+                });
+            }
         });
 
         // --------------------------------------------    Transitions     ---------------------------------------------------------
