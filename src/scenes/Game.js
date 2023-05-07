@@ -832,7 +832,6 @@ const isValidFortify = (scene, start, end, visited = new Set()) => {
     visited.add(start);
     
     for (let i = 0; i < scene.mapData[start].adjacent.length; i++) {
-    
         const territory = scene.mapData[start].adjacent[i];
     
         if(territory.data.owner === scene.turn && !visited.has(territory.data.id)){
@@ -863,20 +862,6 @@ const fortify = (scene) => {
 }
 
 const attackPopUp = (scene, territoryName) => {
-    // Get a reference to the canvas element
-    const canvas = document.querySelector('canvas');
-
-    // Get the position and dimensions of the canvas element
-    const canvasRect = canvas.getBoundingClientRect();
-
-    // Calculate the position and size of the SweetAlert dialog relative to the canvas element
-    const x = canvasRect.left + canvasRect.width * 0.1; // Adjust the x position as needed
-    const y = canvasRect.bottom - canvasRect.height * 0.1; // Adjust the y position as needed
-    let width = canvasRect.width * 0.2; // Adjust the width as needed
-    let height = canvasRect.height * 0.2; // Adjust the height as needed
-
-    height = (height < 195) ? 195 : height;
-    width = (width < 345) ? 345 : width;
 
     if (scene.mapData[scene.clickedTerritory].sprite.data.troops > 1){
         Swal.fire({
@@ -886,12 +871,15 @@ const attackPopUp = (scene, territoryName) => {
             denyButtonText: "Cancel",
             showConfirmButton: false,
             backdrop: false,
-            customClass: 'attack',
-            didOpen: () => {
-                Swal.getPopup().style.left = `${x}px`;
-                // Swal.getPopup().style.top = `${y}px`;
-                Swal.getPopup().style.width = `${width}px`;
-                Swal.getPopup().style.height = `${height}px`;
+            willOpen: (modal) => {
+                const canvasRect = document.querySelector('canvas').getBoundingClientRect();
+  
+                // calculate the x and y positions for the dialog
+                const x = canvasRect.right - canvasRect.width;
+                const y = canvasRect.bottom - canvasRect.height;
+ 
+                modal.style.left = x + 'px';
+                modal.style.bottom = y + 'px';
             }
         }).then(() => {
             scene.clickedTerritory = null;
@@ -911,20 +899,6 @@ const attackPopUp = (scene, territoryName) => {
 }
 
 const fortifyPopUp = (scene, territoryName) => {
-    // Get a reference to the canvas element
-    const canvas = document.querySelector('canvas');
-
-    // Get the position and dimensions of the canvas element
-    const canvasRect = canvas.getBoundingClientRect();
-
-    // Calculate the position and size of the SweetAlert dialog relative to the canvas element
-    const x = canvasRect.left + canvasRect.width * 0.1; // Adjust the x position as needed
-    const y = canvasRect.bottom - canvasRect.height * 0.1; // Adjust the y position as needed
-    let width = canvasRect.width * 0.2; // Adjust the width as needed
-    let height = canvasRect.height * 0.2; // Adjust the height as needed
-
-    height = (height < 195) ? 195 : height;
-    width = (width < 345) ? 345 : width;
 
     if (scene.mapData[scene.clickedTerritory].sprite.data.troops > 1){
         Swal.fire({
@@ -934,12 +908,15 @@ const fortifyPopUp = (scene, territoryName) => {
             denyButtonText: "Cancel",
             showConfirmButton: false,
             backdrop: false,
-            customClass: 'fortify',
-            didOpen: () => {
-                Swal.getPopup().style.left = `${x}px`;
-                // Swal.getPopup().style.top = `${y}px`;
-                Swal.getPopup().style.width = `${width}px`;
-                Swal.getPopup().style.height = `${height}px`;
+            willOpen: (modal) => {
+                const canvasRect = document.querySelector('canvas').getBoundingClientRect();
+  
+                // calculate the x and y positions for the dialog
+                const x = canvasRect.right - canvasRect.width;
+                const y = canvasRect.bottom - canvasRect.height;
+ 
+                modal.style.left = x + 'px';
+                modal.style.bottom = y + 'px';
             }
         }).then(() => {
             scene.clickedTerritory = null;
@@ -985,8 +962,7 @@ const checkWin = (scene, socket) => {
                         sprite.setVisible(false);
                     })
     
-                    //show you lost text
-                    scene.phaseText.getChildren()[4].setVisible(true);
+                    scene.phaseText.getChildren()[4].setVisible(true); //show you lost text
                 }
             }
 
