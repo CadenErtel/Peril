@@ -6,7 +6,7 @@ module.exports = {
     mode: 'production',
     entry: ["core-js/stable", "regenerator-runtime/runtime", "./src/main.js"],
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "public"),
         publicPath: "/",
         filename: "bundle.js",
     },
@@ -37,6 +37,6 @@ module.exports = {
         new webpack.DefinePlugin({
           CANVAS_RENDERER: JSON.stringify(true),
           WEBGL_RENDERER: JSON.stringify(true),
-        }),
+        })
     ],
 };
