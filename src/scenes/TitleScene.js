@@ -73,7 +73,7 @@ export default class TitleScene extends Phaser.Scene {
                 cancelButtonText: 'Cancel',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    console.log('Text entered:', result.value);
+                    // console.log('Text entered:', result.value);
                     socket.emit('createRoom', result.value);
                 }
                 hostBtn.setInteractive();
@@ -144,12 +144,12 @@ export default class TitleScene extends Phaser.Scene {
         });
 
         socket.on('roomCreated', (players) => {
-            console.log(`Room created with code ${players[1].roomCode}`);
+            // console.log(`Room created with code ${players[1].roomCode}`);
             fadeOut('options', this, {socket : socket, players : players, host : true});
         });
         
         socket.on('roomJoined', (players) => {
-            console.log(`Room joined with code ${players[1].roomCode}`);
+            // console.log(`Room joined with code ${players[1].roomCode}`);
             fadeOut('options', this, {socket : socket, players : players, host : false});
         });
         
