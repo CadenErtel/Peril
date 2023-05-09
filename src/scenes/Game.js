@@ -40,8 +40,8 @@ export default class GameScene extends Phaser.Scene {
             colors.push(this.players[player].color);
         }
         
-        const width = this.sys.game.config.width;
-        const height = this.sys.game.config.height;
+        const width = this.scale.width;
+        const height = this.scale.height;
         const triangleHeight = 40; // set the height of the triangle
         const triangleWidth = 30; // set the width of the triangle base
         for (let i = 0; i < this.numPlayers; i++) {

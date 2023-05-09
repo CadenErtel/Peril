@@ -97,22 +97,22 @@ export default class OptionsScene extends Phaser.Scene {
        this.add.text(width / 2 - 190, 75, 'Room Code:', {fontFamily : "blazma", fontSize : "72px"}).setOrigin(.5,.5);
        
        let roomCode = this.add.text(width / 2 + 210, 85, `${data.players[1].roomCode}`, {fontFamily : "poppins", fontSize : "72px"}).setOrigin(.5, .5);
-       roomCode.setInteractive();
-       roomCode.on('pointerdown', function () {
-            navigator.clipboard.writeText(roomCode.text);
-            startBtn.disableInteractive();
-            Swal.fire({
-                title: 'Copied Room Code!',
-                backdrop: false,
-                showConfirmButton: true,
-                allowEscapeKey: true,
-                confirmButtonText: "Ok",
-                timer : 1000,
-                timerProgressBar : true
-            }).then(() => {
-                startBtn.setInteractive();
-            });
-       }); 
+    //    roomCode.setInteractive();
+    //    roomCode.on('pointerdown', function () {
+    //         navigator.clipboard.writeText(roomCode.text);
+    //         startBtn.disableInteractive();
+    //         Swal.fire({
+    //             title: 'Copied Room Code!',
+    //             backdrop: false,
+    //             showConfirmButton: true,
+    //             allowEscapeKey: true,
+    //             confirmButtonText: "Ok",
+    //             timer : 1000,
+    //             timerProgressBar : true
+    //         }).then(() => {
+    //             startBtn.setInteractive();
+    //         });
+    //    }); 
 
         this.add.text(240, height / 6, "Lobby Information", {fontFamily : "blazma", fontSize : "72px"});
 
