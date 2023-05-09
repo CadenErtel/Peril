@@ -34,7 +34,7 @@ export default class OptionsScene extends Phaser.Scene {
         this.playerData = data.players;
 
         for (let i = 0; i < Object.keys(data.players).length; i++){
-            console.log(data.players[i+1].nickname);
+            // console.log(data.players[i+1].nickname);
             let nickname = data.players[i+1].nickname;
             if (i === 0){
                 nickname = "♕" + nickname;

@@ -20,7 +20,7 @@ export function buttonPress (atlas_name, button_name, currentButton) {
 
 export function fadeOut (nextScene, currentScene, data = {}) {
     currentScene.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function () {
-        console.log('Fade out complete for button:', nextScene);
+        // console.log('Fade out complete for button:', nextScene);
         currentScene.scene.start(nextScene, { fadeIn: true, ...data });
     }, currentScene);
     

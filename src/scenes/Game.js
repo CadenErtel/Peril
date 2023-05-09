@@ -222,7 +222,7 @@ export default class GameScene extends Phaser.Scene {
 
         if (this.myPlayer.host) {
             randomizeTerritories(this, socket);
-            console.log("LETS DEPLOY!");
+            // console.log("LETS DEPLOY!");
             nextBtn.setInteractive();
             deploy(this);
         }
@@ -231,7 +231,7 @@ export default class GameScene extends Phaser.Scene {
         
         socket.on('setupTerritories', (updatedMapData) => {
             
-            console.log(updatedMapData);
+            // console.log(updatedMapData);
             
             for (let i = 0; i < this.numPlayers; i++){
                 this.playerGroups[i+1] = this.add.group();
@@ -268,7 +268,7 @@ export default class GameScene extends Phaser.Scene {
                 
                 //if the client hasnt lost
                 if (this.hasLost === false) {
-                    console.log("ITS MY TURRN!!!!!!");
+                    console.log("It's Your Turn!");
 
                     nextBtn.setInteractive(); //if its my current turn, re-enable next turn button
                     
@@ -384,7 +384,7 @@ const initialLoad = (scene, socket) => {
 const applyListeners = (scene, socket) => {
 
     scene.input.on('pointerdown', (pointer) => {
-        console.log("click");
+        // console.log("click");
 
         //determine if a physics body was clicked on
         const clickedBody = scene.matter.query.point(scene.matter.world.localWorld.bodies, pointer.position);
@@ -446,7 +446,7 @@ const applyListeners = (scene, socket) => {
                             if (allowAttack) {
 
                                 const firstTerritory = scene.mapData[scene.clickedTerritory].sprite;
-                                console.log(firstTerritory);
+                                // console.log(firstTerritory);
 
                                 Swal.fire({
                                     title: `How many troops would you like to attack ${territory.gameObject.data.name} with?`,
@@ -500,7 +500,7 @@ const applyListeners = (scene, socket) => {
                         if (allowFortify){
                             
                             const firstTerritory = scene.mapData[scene.clickedTerritory].sprite;
-                            console.log(firstTerritory);
+                            // console.log(firstTerritory);
 
                             Swal.fire({
                                 title: `How many troops would you like to move to ${territory.gameObject.data.name}?`,
@@ -720,13 +720,13 @@ const setAttackPhase = (scene) => {
     scene.stage = "attack";
     currText[0].setTint(0xFFFFFF);
     currText[1].setTint(0x00FF00);
-    console.log("go to attack");
+    // console.log("go to attack");
 }
 
 const setDeployPhase = (scene) => {
     const currText = scene.phaseText.getChildren();
     scene.stage = "deploy";
-    console.log("go to next turn");
+    // console.log("go to next turn");
     currText[2].setTint(0xFFFFFF);
     currText[0].setTint(0x00FF00);
 }
@@ -736,7 +736,7 @@ const setFortifyPhase = (scene) => {
     scene.stage = "fortify";
     currText[1].setTint(0xFFFFFF);
     currText[2].setTint(0x00FF00);
-    console.log("go to fortify");
+    // console.log("go to fortify");
 }
 
 const attack = (scene) => {
@@ -802,10 +802,10 @@ const performAttack = (scene, startingId, defender, troopsAttacking) => {
         //add and remove from corresponding groups
         scene.playerGroups[scene.turn].add(defender);
         scene.playerGroups[defender.data.owner].remove(defender);
-        console.log(scene.playerGroups[defender.data.owner]);
+        // console.log(scene.playerGroups[defender.data.owner]);
         defender.data.owner = scene.turn;
 
-        console.log(scene.playerGroups[scene.turn]);
+        // console.log(scene.playerGroups[scene.turn]);
         
     } else {
         defender.data.troops = troopsDefending;
@@ -936,7 +936,7 @@ const fortifyPopUp = (scene, territoryName) => {
 }
 
 const checkWin = (scene, socket) => {
-    console.log(scene.myPlayer);
+    // console.log(scene.myPlayer);
     const numTerritories = Object.keys(scene.mapData).length;
     const numPlayers = Object.keys(scene.players).length;
 
